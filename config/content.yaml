@@ -1,0 +1,34 @@
+# ── Samavaya Niramaya Content Config ─────────────────────
+# Static content rotated / selected by builder.py
+
+featured_conditions:
+  - lower_back_pain
+  - anxiety
+  - insomnia
+  - digestive_issues
+  - migraine
+  - hypertension
+  - fatigue
+  - knee_pain
+  - hormonal_balance
+  - grief_loss
+  - sinusitis
+  - eye_strain
+  - frozen_shoulder
+  - diabetes_management
+
+wisdom_sources:
+  - yoga_sutras
+  - bhagavad_gita
+  - upanishads
+  - hatha_yoga_pradipika
+
+market_headlines:
+  - "Wellness tourism grows 15% YoY — yoga leads"
+  - "Corporate wellness budgets up 22% in FY26"
+  - "Online yoga subscriptions plateau — live sessions surge"
+  - "Prenatal & postnatal yoga demand at 5-year high"
+  - "Ayurveda + yoga combos command 30% premium"
+  - "60+ demographic is fastest-growing yoga segment"
+  - "Trauma-informed yoga certifications in high demand"
+  - "Sound healing + yoga fusion trending across metros"

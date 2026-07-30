@@ -1,0 +1,72 @@
+# ── Samavaya Niramaya Schedule Config ────────────────────
+# Default class schedule used as seed data.
+# The pipeline embeds this into the daily JSON payload.
+
+classes:
+  - id: cls_001
+    name: Morning Hatha
+    day: Monday
+    time: "07:00"
+    venue: "Ananda Studio, Pune"
+    type: fixed
+    capacity: 10
+    enrolled: 8
+    rate: 4800
+
+  - id: cls_002
+    name: Evening Vinyasa
+    day: Monday
+    time: "18:30"
+    venue: "Skyflow Wellness, Pune"
+    type: fixed
+    capacity: 12
+    enrolled: 9
+    rate: 5200
+
+  - id: cls_003
+    name: Yin Yoga
+    day: Wednesday
+    time: "19:00"
+    venue: "Ananda Studio, Pune"
+    type: dropin
+    capacity: 8
+    enrolled: 5
+    rate: 800
+
+  - id: cls_004
+    name: Pranayama & Meditation
+    day: Thursday
+    time: "06:30"
+    venue: Online (Zoom)
+    type: fixed
+    capacity: 20
+    enrolled: 14
+    rate: 2500
+
+  - id: cls_005
+    name: Weekend Warriors Flow
+    day: Saturday
+    time: "08:00"
+    venue: "Terrace Garden, Koregaon Park"
+    type: dropin
+    capacity: 15
+    enrolled: 11
+    rate: 600
+
+  - id: cls_006
+    name: Sound Bath + Yoga Nidra
+    day: Sunday
+    time: "10:00"
+    venue: "Ananda Studio, Pune"
+    type: event
+    capacity: 20
+    enrolled: 18
+    rate: 1200
+
+week_theme: "Sthira Sukham Asanam — Stability & Ease"
+week_ref: "Yoga Sutras 2.46"
+pranayama: "Nadi Shodhana"
+sound_frequency: "432 Hz"
+chakra: "Anahata (Heart)"
+instrument: "Tibetan Singing Bowl"
+sound_duration: "20 min"
