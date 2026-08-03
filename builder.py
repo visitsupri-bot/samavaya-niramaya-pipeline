@@ -81,9 +81,11 @@ def rotate_payload(payload: dict, day_of_year: int, config: dict) -> dict:
         rotated_source = pick_by_day(wisdom_sources, day_of_year)
         p["sections"]["wisdom"]["_featured_source"] = rotated_source
 
-    # Rotate market headline
+    # Rotate market headline — only if not already set by live fetcher
     headlines = config["content"].get("market_headlines", [])
-    if headlines and "opportunity" in p.get("sections", {}):
+    opp = p.get("sections", {}).get("opportunity", {})
+    live_headline = opp.get("_live_market_headline")
+    if headlines and "opportunity" in p.get("sections", {}) and not live_headline:
         p["sections"]["opportunity"]["market_headline"] = pick_by_day(headlines, day_of_year)
 
     # Inject schedule from config

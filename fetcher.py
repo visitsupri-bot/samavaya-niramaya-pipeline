@@ -344,9 +344,10 @@ def fetch_opportunity(api_key: str, niche: str) -> Optional[dict]:
     venues = _select_venues(cfg, niche)
 
     return {
-        "market_headline": market_headline,
-        "trends":          trends,
-        "venues":          venues,
+        "market_headline":       market_headline,
+        "_live_market_headline": True,   # sentinel: tells rotate_payload not to overwrite
+        "trends":                trends,
+        "venues":                venues,
         "trend_data": {
             "youtube_count": len(yt_results),
             "trends_count":  len(trend_results),
