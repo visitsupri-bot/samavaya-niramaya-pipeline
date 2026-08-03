@@ -14,10 +14,19 @@ Usage:
 import json
 import argparse
 import copy
+import logging
+import os
 from datetime import date, datetime, timezone
 from pathlib import Path
 
 import yaml  # PyYAML — see requirements.txt
+
+try:
+    import fetcher as _fetcher
+except ImportError:  # pragma: no cover
+    _fetcher = None  # type: ignore[assignment]
+
+logger = logging.getLogger(__name__)
 
 
 # ── Paths ─────────────────────────────────────────────────
@@ -108,6 +117,30 @@ def build(target_date: date, source_json: Path | None) -> dict:
     # Stamp metadata
     base["generated_at"] = datetime.now(timezone.utc).isoformat()
     base["date"] = target_date.isoformat()
+
+    # ── Optional: enrich opportunity section with live trend data ──
+    youtube_api_key = os.environ.get("YOUTUBE_API_KEY", "")
+    if _fetcher is not None and youtube_api_key:
+        niche = config["content"].get("default_niche", "yoga_india")
+        logger.info("Fetching live opportunity data for niche=%r", niche)
+        try:
+            opportunity_data = _fetcher.fetch_opportunity(youtube_api_key, niche)
+            if opportunity_data:
+                base.setdefault("sections", {}).setdefault("opportunity", {}).update(
+                    opportunity_data
+                )
+                logger.info(
+                    "Opportunity section enriched: %d YT results, %d trend entries",
+                    opportunity_data.get("trend_data", {}).get("youtube_count", 0),
+                    opportunity_data.get("trend_data", {}).get("trends_count", 0),
+                )
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("fetch_opportunity failed, continuing without live data: %s", exc)
+    else:
+        if _fetcher is None:
+            logger.debug("fetcher module unavailable — skipping live trend enrichment")
+        else:
+            logger.info("YOUTUBE_API_KEY not set — skipping live trend enrichment")
 
     return rotate_payload(base, day_of_year, config)
 

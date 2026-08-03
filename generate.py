@@ -21,6 +21,9 @@ import builder
 import uploader
 
 
+SEP = "=" * 55
+
+
 def main():
     parser = argparse.ArgumentParser(description="Samavaya Niramaya — full daily pipeline")
     parser.add_argument("--date",        default=None, help="Target date YYYY-MM-DD (default: today)")
@@ -32,33 +35,33 @@ def main():
     target_date = date.fromisoformat(args.date) if args.date else date.today()
     source_path = Path(args.source_json) if args.source_json else None
 
-    print(f"
-{'='*55}")
-    print(f"  🪷 Samavaya Niramaya Pipeline — {target_date.isoformat()}")
-    print(f"{'='*55}")
+    print("")
+    print(SEP)
+    print("  🪷 Samavaya Niramaya Pipeline — " + target_date.isoformat())
+    print(SEP)
 
     # Step 1: Build
-    print("
-[1/2] Building daily payload…")
+    print("")
+    print("[1/2] Building daily payload...")
     payload = builder.build(target_date, source_path)
     builder.write_output(payload, target_date)
 
     # Step 2: Upload (unless --skip-upload)
     if args.skip_upload:
-        print("
-[2/2] Skipping upload (--skip-upload flag set)")
+        print("")
+        print("[2/2] Skipping upload (--skip-upload flag set)")
     else:
-        print("
-[2/2] Uploading to GCS…")
+        print("")
+        print("[2/2] Uploading to GCS...")
         try:
             uploader.upload(target_date, args.bucket)
         except Exception as exc:
-            print(f"❌ Upload failed: {exc}", file=sys.stderr)
+            print("Upload failed: " + str(exc), file=sys.stderr)
             sys.exit(1)
 
-    print(f"
-✅ Pipeline complete for {target_date.isoformat()}
-")
+    print("")
+    print("Pipeline complete for " + target_date.isoformat())
+    print("")
 
 
 if __name__ == "__main__":

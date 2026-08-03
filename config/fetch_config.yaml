@@ -1,0 +1,65 @@
+# ── Samavaya Niramaya Fetch Config ────────────────────────
+# Per-niche configuration for YouTube Data API v3 and Google
+# Trends queries, plus opportunity template strings.
+# Used exclusively by fetcher.py.
+
+niches:
+  yoga_india:
+    youtube_queries:
+      - "yoga for beginners India 2025"
+      - "hatha yoga morning routine India"
+      - "yoga for back pain Hindi"
+      - "pranayama benefits India"
+    google_trends_keywords:
+      - "yoga classes near me"
+      - "online yoga India"
+      - "yoga teacher training India"
+    opportunity_template: >
+      Growing demand for {trend_topic} signals a {trend_direction}
+      opportunity in the Indian yoga market. Wellness seekers are
+      searching for authentic, teacher-led experiences.
+
+  sound_healing:
+    youtube_queries:
+      - "sound bath meditation 432Hz"
+      - "tibetan singing bowls healing"
+      - "sound healing session India"
+      - "binaural beats meditation"
+    google_trends_keywords:
+      - "sound healing"
+      - "singing bowls therapy"
+      - "sound bath near me"
+    opportunity_template: >
+      {trend_topic} is trending {trend_direction}, pointing to rising
+      consumer interest in vibrational wellness and immersive audio
+      healing experiences.
+
+  corporate_wellness:
+    youtube_queries:
+      - "corporate yoga office wellness"
+      - "desk yoga stretches workplace"
+      - "mindfulness for professionals India"
+      - "stress relief yoga corporate"
+    google_trends_keywords:
+      - "corporate wellness program"
+      - "employee wellness India"
+      - "workplace mindfulness"
+    opportunity_template: >
+      Corporate searches for {trend_topic} are moving {trend_direction},
+      indicating budget allocation toward structured employee wellness
+      programs in Indian enterprises.
+
+  retreat_luxury:
+    youtube_queries:
+      - "luxury yoga retreat India"
+      - "wellness retreat Rishikesh"
+      - "Ayurveda retreat Kerala"
+      - "silent retreat meditation India"
+    google_trends_keywords:
+      - "yoga retreat India"
+      - "luxury wellness retreat"
+      - "Ayurveda retreat"
+    opportunity_template: >
+      Search interest in {trend_topic} is {trend_direction}, reflecting
+      strong post-pandemic appetite for premium wellness travel and
+      curated retreat experiences in India.
