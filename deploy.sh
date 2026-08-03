@@ -27,8 +27,8 @@ gcloud services enable storage.googleapis.com run.googleapis.com cloudscheduler.
 
 # ── 2. GCS bucket + CORS ──────────────────────────────────
 echo "[2/8] Creating GCS bucket gs://${BUCKET}…"
-if ! gsutil ls -b "gs://${BUCKET}" &>/dev/null; then
-  gsutil mb -p "${PROJECT}" -l "${REGION}" "gs://${BUCKET}"
+if ! gcloud storage buckets describe "gs://${BUCKET}" --project="${PROJECT}" &>/dev/null; then
+  gcloud storage buckets create "gs://${BUCKET}" --location="${REGION}" --project="${PROJECT}"
 else
   echo "  Bucket already exists, skipping."
 fi
@@ -37,8 +37,9 @@ echo "[2/8] Setting CORS…"
 cat > /tmp/sn_cors.json <<'CORS'
 [{"origin":["*"],"method":["GET","HEAD"],"responseHeader":["Content-Type","Cache-Control"],"maxAgeSeconds":3600}]
 CORS
-gsutil cors set /tmp/sn_cors.json "gs://${BUCKET}"
-gsutil iam ch allUsers:objectViewer "gs://${BUCKET}"
+gcloud storage buckets update "gs://${BUCKET}" --cors-file=/tmp/sn_cors.json
+gcloud storage buckets add-iam-policy-binding "gs://${BUCKET}" \
+  --member="allUsers" --role="roles/storage.objectViewer"
 
 # ── 3. Artifact Registry ──────────────────────────────────
 echo "[3/8] Creating Artifact Registry repo ${REPO}…"
