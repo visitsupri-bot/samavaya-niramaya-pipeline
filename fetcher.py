@@ -191,19 +191,48 @@ def fetch_google_trends(keywords: list[str]) -> list[dict]:
 
 # ── Opportunity assembler ─────────────────────────────────
 
+_MAX_VENUES = 6  # max venues returned per niche
+
+
+def _format(template: str, trend_topic: str, trend_direction: str) -> str:
+    """Safe format — falls back gracefully if template is empty."""
+    try:
+        return template.format(
+            trend_topic=trend_topic,
+            trend_direction=trend_direction,
+        ).strip()
+    except (KeyError, ValueError):
+        return template.strip()
+
+
+def _select_venues(cfg: dict, niche: str, max_venues: int = _MAX_VENUES) -> list[dict]:
+    """
+    Return venues from the config pool that match *niche*, stripped of the
+    internal 'niches' tag before returning.  Primary niche matches come first.
+    """
+    all_venues = cfg.get("venues", [])
+    primary   = [v for v in all_venues if v.get("niches", [])[0:1] == [niche]]
+    secondary = [v for v in all_venues if niche in v.get("niches", []) and v not in primary]
+    selected  = (primary + secondary)[:max_venues]
+    return [
+        {k: v for k, v in venue.items() if k != "niches"}
+        for venue in selected
+    ]
+
+
 def fetch_opportunity(api_key: str, niche: str) -> Optional[dict]:
     """
-    Assemble a partial opportunity dict for *niche* using live trend data.
+    Assemble a full rich opportunity dict for *niche* using live trend data.
 
     Returns a dict with keys:
-        market_headline  str   — human-readable headline derived from top trend
-        trend_data       dict  — raw summary {"youtube_count": int, "trends_count": int}
-        trends           list  — Google Trends entries (may be [])
+        market_headline  str   — live headline derived from top trend
+        trends           list  — 2 platform entries (YouTube + Google Trends),
+                                 each with: platform, headline, hashtags[], opportunity
+        venues           list  — niche-filtered venues from config pool
+        trend_data       dict  — raw counts {"youtube_count": int, "trends_count": int}
 
-    Returns None if both YouTube and Google Trends return empty results (nothing
-    to enrich with), or if the niche is not found in fetch_config.yaml.
-
-    Does NOT touch venues[] or differentiation[].
+    Does NOT touch differentiation[].
+    Returns None if both sources are empty or niche is unknown.
     """
     cfg = _load_fetch_config()
     niche_cfg = cfg.get("niches", {}).get(niche)
@@ -214,8 +243,9 @@ def fetch_opportunity(api_key: str, niche: str) -> Optional[dict]:
     youtube_queries      = niche_cfg.get("youtube_queries", [])
     trends_keywords      = niche_cfg.get("google_trends_keywords", [])
     opportunity_template = niche_cfg.get("opportunity_template", "")
+    platform_insights    = niche_cfg.get("platform_insights", {})
 
-    # ── Fetch in parallel (sequential here, kept simple) ──
+    # ── Fetch live data ────────────────────────────────────
     yt_results    = fetch_youtube_trends(api_key, youtube_queries)
     trend_results = fetch_google_trends(trends_keywords)
 
@@ -225,35 +255,100 @@ def fetch_opportunity(api_key: str, niche: str) -> Optional[dict]:
         )
         return None
 
-    # ── Derive headline ────────────────────────────────────
-    top_yt_title = yt_results[0]["title"] if yt_results else ""
-    top_trend    = trend_results[0] if trend_results else {}
-
-    trend_topic     = top_trend.get("keyword", top_yt_title) or niche.replace("_", " ")
+    # ── Shared context ─────────────────────────────────────
+    top_trend       = trend_results[0] if trend_results else {}
+    top_yt_title    = yt_results[0]["title"] if yt_results else ""
+    trend_topic     = top_trend.get("keyword", "") or top_yt_title or niche.replace("_", " ")
     is_rising       = top_trend.get("is_rising", True)
     trend_direction = "upward" if is_rising else "stable"
 
-    market_headline = opportunity_template.format(
-        trend_topic=trend_topic,
-        trend_direction=trend_direction,
-    ).strip()
-
+    # ── Market headline ────────────────────────────────────
+    market_headline = _format(opportunity_template, trend_topic, trend_direction)
     if not market_headline:
-        # Fallback if template is empty
         market_headline = f"{trend_topic} interest is {trend_direction}"
 
-    # ── Tags from top YouTube result ───────────────────────
-    # We only have snippet data (no tags[] in search response); use titles as
-    # a proxy.  The field is informational only.
-    top_yt_tag = yt_results[0]["query"] if yt_results else niche
+    # ── YouTube platform entry ─────────────────────────────
+    yt_headline = (
+        f"{top_yt_title} — trending {trend_direction} on YouTube India"
+        if top_yt_title
+        else f"YouTube India: {niche.replace('_', ' ')} content moving {trend_direction}"
+    )
+    # Use unique queries as hashtags (deduplicated, cleaned)
+    yt_seen: set[str] = set()
+    yt_hashtags: list[str] = []
+    for entry in yt_results:
+        tag = "#" + entry["query"].replace(" ", "").replace("-", "")[:30]
+        if tag not in yt_seen:
+            yt_seen.add(tag)
+            yt_hashtags.append(tag)
+        if len(yt_hashtags) >= 5:
+            break
+    if not yt_hashtags:
+        yt_hashtags = [f"#{q.split()[0].lower()}" for q in youtube_queries[:3]]
+
+    yt_insight = _format(
+        platform_insights.get("youtube", ""),
+        trend_topic,
+        trend_direction,
+    ) or f"{trend_topic} content is {trend_direction} on YouTube — first-mover opportunity available."
+
+    yt_entry = {
+        "platform":    "YouTube India",
+        "headline":    yt_headline,
+        "hashtags":    yt_hashtags,
+        "opportunity": yt_insight,
+    }
+
+    # ── Google Trends platform entry ───────────────────────
+    if trend_results:
+        peak   = trend_results[0].get("peak_interest", 0)
+        avg    = trend_results[0].get("avg_interest", 0)
+        change = peak - avg
+        gt_headline = (
+            f'"{trend_topic}" searches {trend_direction} '
+            f"— peak interest {peak}/100, avg {avg}/100 this week"
+        )
+    else:
+        gt_headline = f"{trend_topic} search interest is {trend_direction} across India"
+
+    gt_hashtags = [kw.replace(" ", " ") for kw in trends_keywords[:5]]
+
+    gt_insight = _format(
+        platform_insights.get("google_trends", ""),
+        trend_topic,
+        trend_direction,
+    ) or f"Search demand for {trend_topic} is {trend_direction} — strong organic discovery opportunity."
+
+    gt_entry = {
+        "platform":    "Google Trends India",
+        "headline":    gt_headline,
+        "hashtags":    gt_hashtags,
+        "opportunity": gt_insight,
+    }
+
+    # ── Build trends list (YouTube first, then Trends) ─────
+    trends: list[dict] = []
+    if yt_results:
+        trends.append(yt_entry)
+    if trend_results:
+        trends.append(gt_entry)
+    # If only one source succeeded, still include the other with a note
+    if yt_results and not trend_results:
+        gt_entry["headline"] = f"Google Trends data unavailable — {trend_topic} YouTube demand is {trend_direction}"
+        trends.append(gt_entry)
+    elif trend_results and not yt_results:
+        yt_entry["headline"] = f"YouTube data unavailable — {trend_topic} search interest is {trend_direction}"
+        trends.insert(0, yt_entry)
+
+    # ── Venues filtered by niche ───────────────────────────
+    venues = _select_venues(cfg, niche)
 
     return {
         "market_headline": market_headline,
+        "trends":          trends,
+        "venues":          venues,
         "trend_data": {
             "youtube_count": len(yt_results),
             "trends_count":  len(trend_results),
         },
-        "trends": trend_results,
-        # Convenience field used downstream if callers want a search label
-        "_top_yt_tag": top_yt_tag,
     }

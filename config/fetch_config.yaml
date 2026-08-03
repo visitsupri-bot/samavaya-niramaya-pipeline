@@ -1,6 +1,6 @@
 # ── Samavaya Niramaya Fetch Config ────────────────────────
 # Per-niche configuration for YouTube Data API v3 and Google
-# Trends queries, plus opportunity template strings.
+# Trends queries, opportunity insights, and venue pool.
 # Used exclusively by fetcher.py.
 
 niches:
@@ -18,6 +18,17 @@ niches:
       Growing demand for {trend_topic} signals a {trend_direction}
       opportunity in the Indian yoga market. Wellness seekers are
       searching for authentic, teacher-led experiences.
+    platform_insights:
+      youtube: >
+        Yoga content on YouTube India is {trend_direction} — authentic
+        teacher-led videos on {trend_topic} are driving the highest
+        watch time. First-mover advantage available for structured
+        progressive series.
+      google_trends: >
+        Search demand for {trend_topic} is {trend_direction} across
+        India — Tier-1 cities leading, Tier-2 cities catching up fast.
+        Condition-specific yoga commands strong pricing power vs.
+        generic classes.
 
   sound_healing:
     youtube_queries:
@@ -33,6 +44,16 @@ niches:
       {trend_topic} is trending {trend_direction}, pointing to rising
       consumer interest in vibrational wellness and immersive audio
       healing experiences.
+    platform_insights:
+      youtube: >
+        Sound healing content on YouTube is {trend_direction} — videos
+        on {trend_topic} averaging strong watch-through rates. No major
+        Indian teacher has systematised Nada Yoga + sound bath content
+        at scale.
+      google_trends: >
+        Search interest in {trend_topic} is moving {trend_direction}
+        across India — virtually no practitioner in Tier-1 cities
+        offering weekly public sound baths at accessible price points.
 
   corporate_wellness:
     youtube_queries:
@@ -48,6 +69,16 @@ niches:
       Corporate searches for {trend_topic} are moving {trend_direction},
       indicating budget allocation toward structured employee wellness
       programs in Indian enterprises.
+    platform_insights:
+      youtube: >
+        Corporate wellness content is {trend_direction} on YouTube —
+        {trend_topic} videos targeting HR decision-makers and employees
+        are underserved. Short-format desk yoga series have high
+        shareability inside organisations.
+      google_trends: >
+        HR teams are searching {trend_direction} for {trend_topic} —
+        Q4 budget cycles drive spike in corporate wellness procurement.
+        Long-term contracts available with structured proposals.
 
   retreat_luxury:
     youtube_queries:
@@ -63,3 +94,102 @@ niches:
       Search interest in {trend_topic} is {trend_direction}, reflecting
       strong post-pandemic appetite for premium wellness travel and
       curated retreat experiences in India.
+    platform_insights:
+      youtube: >
+        Luxury retreat content is {trend_direction} on YouTube —
+        {trend_topic} vlogs and immersive retreat documentaries driving
+        aspirational demand. Properties actively seeking resident
+        facilitators for 2026-27 calendars.
+      google_trends: >
+        {trend_topic} searches are {trend_direction} — premium retreat
+        seekers researching 3-7 day immersions are willing to pay
+        ₹40,000+ per block. Sound healing + yoga fusion commands the
+        highest per-night rates.
+
+# ── Venue pool ────────────────────────────────────────────
+# Each venue is tagged with one or more niches.
+# fetcher.py selects the top venues matching the trending niche.
+venues:
+  - icon: "🏨"
+    name: "ITC Maratha"
+    city: "Mumbai"
+    badge: "High Value"
+    note: "5-star property, hosts corporate wellness — in-residence teacher opportunity Q4"
+    niches: [corporate_wellness, yoga_india]
+
+  - icon: "🏨"
+    name: "The Leela Palace"
+    city: "Bangalore"
+    badge: "High Value"
+    note: "Wellness Director actively seeking sound healing facilitators for weekend retreats"
+    niches: [sound_healing, retreat_luxury]
+
+  - icon: "🏢"
+    name: "TCS Innovation Campus"
+    city: "Pune"
+    badge: "Corporate"
+    note: "HR team receptive to Yoga + Stress Management series — 200+ employee batch possible"
+    niches: [corporate_wellness, yoga_india]
+
+  - icon: "🏢"
+    name: "Infosys Mysore Campus"
+    city: "Mysore"
+    badge: "Corporate"
+    note: "Large campus wellness budget, Ayush-aligned programs preferred by leadership"
+    niches: [corporate_wellness, yoga_india]
+
+  - icon: "🏛️"
+    name: "Ministry of AYUSH"
+    city: "New Delhi"
+    badge: "Govt"
+    note: "National wellness missions seeking certified Yoga + Ayurveda practitioners for outreach"
+    niches: [yoga_india, sound_healing]
+
+  - icon: "🏛️"
+    name: "Indian Navy Wellness"
+    city: "Mumbai"
+    badge: "Govt"
+    note: "Defence wellness programs — Yoga certification + therapeutic specialisation preferred"
+    niches: [yoga_india, corporate_wellness]
+
+  - icon: "🌴"
+    name: "Ananda in the Himalayas"
+    city: "Uttarakhand"
+    badge: "High Value"
+    note: "Premium retreat centre, 3-7 day Sound & Yoga immersions — ₹40K+ per retreat block"
+    niches: [retreat_luxury, sound_healing]
+
+  - icon: "🏡"
+    name: "Shreyas Retreat"
+    city: "Bangalore"
+    badge: "High Value"
+    note: "Boutique luxury retreat, seeking resident facilitators for 2027 calendar"
+    niches: [retreat_luxury, yoga_india]
+
+  - icon: "🏨"
+    name: "Address Beach Resort"
+    city: "Dubai"
+    badge: "High Value"
+    note: "UAE expat wellness — South Asian diaspora market, strong demand for Nada Yoga"
+    niches: [sound_healing, retreat_luxury]
+
+  - icon: "🏢"
+    name: "DIFC Wellness Hub"
+    city: "Dubai"
+    badge: "Corporate"
+    note: "Corporate wellness contracts for Indian diaspora companies in Dubai financial district"
+    niches: [corporate_wellness, yoga_india]
+
+  - icon: "🏛️"
+    name: "Sattva London"
+    city: "London"
+    badge: "High Value"
+    note: "South Asian yoga community, monthly sound bath series, visiting teacher program"
+    niches: [sound_healing, yoga_india]
+
+  - icon: "🌴"
+    name: "Fivelements Bali"
+    city: "Bali"
+    badge: "High Value"
+    note: "Premium retreat venue, Ayurveda + sound healing — visiting teacher residency model"
+    niches: [retreat_luxury, sound_healing]

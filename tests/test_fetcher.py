@@ -405,11 +405,17 @@ class TestFetchOpportunity(unittest.TestCase):
 
         self.assertIsNotNone(result)
         assert result is not None
-        for key in ("market_headline", "trend_data", "trends"):
+        for key in ("market_headline", "trend_data", "trends", "venues"):
             self.assertIn(key, result)
-        self.assertEqual(result["trends"], [])
+        # trends[] has 2 entries: YouTube + Google Trends (fallback with note)
+        self.assertEqual(len(result["trends"]), 2)
+        platforms = [t["platform"] for t in result["trends"]]
+        self.assertIn("YouTube India", platforms)
+        self.assertIn("Google Trends India", platforms)
         self.assertEqual(result["trend_data"]["youtube_count"], 1)
         self.assertEqual(result["trend_data"]["trends_count"], 0)
+        # venues are populated from config pool
+        self.assertGreater(len(result["venues"]), 0)
 
     # 19. Returns dict with required keys on partial success (trends only)
     def test_partial_success_trends_only(self):
@@ -421,10 +427,13 @@ class TestFetchOpportunity(unittest.TestCase):
 
         self.assertIsNotNone(result)
         assert result is not None
+        for key in ("market_headline", "trend_data", "trends", "venues"):
+            self.assertIn(key, result)
         self.assertEqual(result["trend_data"]["youtube_count"], 0)
         self.assertEqual(result["trend_data"]["trends_count"], 1)
-        self.assertIn("market_headline", result)
         self.assertGreater(len(result["market_headline"]), 0)
+        self.assertEqual(len(result["trends"]), 2)
+        self.assertGreater(len(result["venues"]), 0)
 
     # Bonus — 20th test: trend_direction is "upward" for rising trend
     def test_trend_direction_upward_for_rising(self):
