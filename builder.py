@@ -178,9 +178,12 @@ def build(target_date: date, source_json: Path | None) -> dict:
             logger.info("YOUTUBE_API_KEY not set — skipping live trend enrichment")
 
     # Preserve user-data keys from live JSON so pipeline never overwrites app edits
+    # NOTE: must happen AFTER opportunity enrichment so live YouTube data is not clobbered
     live_user_data = fetch_live_user_data()
     if live_user_data:
-        base.setdefault('sections', {}).update(live_user_data)
+        s = base.setdefault('sections', {})
+        for k, v in live_user_data.items():
+            s[k] = v  # overwrite each user-data key individually (never touches opportunity)
         logger.info('Preserved user-data keys from live JSON: %s', list(live_user_data.keys()))
     else:
         logger.warning(

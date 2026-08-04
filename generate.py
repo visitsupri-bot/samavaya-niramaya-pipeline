@@ -13,12 +13,15 @@ Usage:
 """
 
 import argparse
+import logging
 import sys
 from datetime import date
 from pathlib import Path
 
 import builder
 import uploader
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:%(message)s')
 
 
 SEP = "=" * 55
