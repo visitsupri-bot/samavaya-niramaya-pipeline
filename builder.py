@@ -19,6 +19,9 @@ import os
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+import urllib.error
+import urllib.request
+
 import yaml  # PyYAML — see requirements.txt
 
 try:
@@ -27,6 +30,36 @@ except ImportError:  # pragma: no cover
     _fetcher = None  # type: ignore[assignment]
 
 logger = logging.getLogger(__name__)
+
+# ── User-data preservation ────────────────────────────────
+# Keys owned exclusively by the app — pipeline never overwrites these
+USER_DATA_KEYS = [
+    'participants', 'attendance', 'invoices', 'venues',
+    'week_overrides', 'venue_pipeline', 'wisdom_favourites',
+]
+
+GCS_LATEST_URL = 'https://storage.googleapis.com/samavaya-niramaya/daily/latest.json'
+GITHUB_RAW_URL = (
+    'https://raw.githubusercontent.com/visitsupri-bot/samavaya-niramaya-app'
+    '/main/sample-data/latest.json'
+)
+
+
+def fetch_live_user_data() -> dict:
+    """
+    Fetches the currently-live latest.json from GCS (or GitHub raw as fallback)
+    and returns only the user-data section keys.
+    Returns an empty dict if neither source is reachable.
+    """
+    for url in (GCS_LATEST_URL, GITHUB_RAW_URL):
+        try:
+            with urllib.request.urlopen(url, timeout=10) as resp:
+                live = json.loads(resp.read().decode())
+                sections = live.get('sections', {})
+                return {k: sections[k] for k in USER_DATA_KEYS if k in sections}
+        except Exception as exc:  # noqa: BLE001
+            logger.warning('Could not fetch live user data from %s: %s', url, exc)
+    return {}
 
 
 # ── Paths ─────────────────────────────────────────────────
@@ -143,6 +176,16 @@ def build(target_date: date, source_json: Path | None) -> dict:
             logger.debug("fetcher module unavailable — skipping live trend enrichment")
         else:
             logger.info("YOUTUBE_API_KEY not set — skipping live trend enrichment")
+
+    # Preserve user-data keys from live JSON so pipeline never overwrites app edits
+    live_user_data = fetch_live_user_data()
+    if live_user_data:
+        base.setdefault('sections', {}).update(live_user_data)
+        logger.info('Preserved user-data keys from live JSON: %s', list(live_user_data.keys()))
+    else:
+        logger.warning(
+            'No live user data found — pipeline will use template values for user-data keys'
+        )
 
     return rotate_payload(base, day_of_year, config)
 
