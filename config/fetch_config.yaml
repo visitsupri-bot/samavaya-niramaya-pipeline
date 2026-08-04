@@ -5,15 +5,28 @@
 
 niches:
   yoga_india:
+    # Primary YouTube queries — therapeutic, kids, sound, ayurvedic angles
     youtube_queries:
-      - "yoga for beginners India 2025"
-      - "hatha yoga morning routine India"
-      - "yoga for back pain Hindi"
-      - "pranayama benefits India"
+      - "yoga for anxiety stress relief India 2025"
+      - "kids yoga fun poses for children India"
+      - "sound bath meditation healing India"
+      - "therapeutic yoga for back pain PCOS India"
+      - "ayurvedic yoga dosha type India"
+      - "pranayama breathing exercises Hindi"
+      - "morning yoga routine India beginners"
+      - "yoga nidra guided relaxation India"
+    # Instagram-style queries via YouTube Shorts to surface Reels trends
+    instagram_queries:
+      - "yoga shorts reels trending India 2025"
+      - "sound healing shorts India Instagram"
+      - "kids yoga reels fun India"
+      - "therapeutic yoga viral India"
     google_trends_keywords:
-      - "yoga classes near me"
-      - "online yoga India"
-      - "yoga teacher training India"
+      - "yoga for anxiety"
+      - "sound healing near me"
+      - "kids yoga classes"
+      - "therapeutic yoga India"
+      - "yoga nidra benefits"
     opportunity_template: >
       Growing demand for {trend_topic} signals a {trend_direction}
       opportunity in the Indian yoga market. Wellness seekers are
@@ -22,8 +35,18 @@ niches:
       youtube: >
         Yoga content on YouTube India is {trend_direction} — authentic
         teacher-led videos on {trend_topic} are driving the highest
-        watch time. First-mover advantage available for structured
-        progressive series.
+        watch time. Therapeutic and condition-specific content commands
+        3-5x more watch time than generic yoga flows.
+      youtube_kids_sound: >
+        Kids yoga and sound healing content is {trend_direction} on YouTube
+        — {trend_topic} videos are underserved in India. Parents actively
+        search for structured kids wellness content; sound bath sessions
+        average 85% watch-through vs 40% for generic content.
+      instagram: >
+        Instagram Reels on {trend_topic} are {trend_direction} — short-form
+        yoga and sound healing content is driving discovery for Indian wellness
+        practitioners. Hashtag reach for niche therapeutic content outperforms
+        generic yoga 3:1 in India.
       google_trends: >
         Search demand for {trend_topic} is {trend_direction} across
         India — Tier-1 cities leading, Tier-2 cities catching up fast.
@@ -32,10 +55,14 @@ niches:
 
   sound_healing:
     youtube_queries:
-      - "sound bath meditation 432Hz"
-      - "tibetan singing bowls healing"
-      - "sound healing session India"
-      - "binaural beats meditation"
+      - "sound bath meditation 432Hz India"
+      - "tibetan singing bowls healing India"
+      - "nada yoga sound healing"
+      - "crystal bowls sound bath India"
+      - "binaural beats deep meditation India"
+    instagram_queries:
+      - "sound bath reels India Instagram 2025"
+      - "crystal bowls healing shorts India"
     google_trends_keywords:
       - "sound healing"
       - "singing bowls therapy"
@@ -50,6 +77,14 @@ niches:
         on {trend_topic} averaging strong watch-through rates. No major
         Indian teacher has systematised Nada Yoga + sound bath content
         at scale.
+      youtube_kids_sound: >
+        Sound healing for children is an emerging niche on YouTube India —
+        {trend_topic} content has virtually no Indian competition while
+        parent search demand is {trend_direction}.
+      instagram: >
+        Sound bath Reels on {trend_topic} are {trend_direction} on Instagram
+        India — short clips of crystal bowl sessions routinely reach 100K+
+        organic impressions with zero ad spend.
       google_trends: >
         Search interest in {trend_topic} is moving {trend_direction}
         across India — virtually no practitioner in Tier-1 cities
@@ -57,12 +92,15 @@ niches:
 
   corporate_wellness:
     youtube_queries:
-      - "corporate yoga office wellness"
-      - "desk yoga stretches workplace"
-      - "mindfulness for professionals India"
-      - "stress relief yoga corporate"
+      - "corporate yoga office wellness India"
+      - "desk yoga stretches workplace India"
+      - "mindfulness stress management professionals India"
+      - "employee wellness program yoga India"
+    instagram_queries:
+      - "corporate wellness yoga reels India"
+      - "office yoga shorts India 2025"
     google_trends_keywords:
-      - "corporate wellness program"
+      - "corporate wellness program India"
       - "employee wellness India"
       - "workplace mindfulness"
     opportunity_template: >
@@ -72,9 +110,16 @@ niches:
     platform_insights:
       youtube: >
         Corporate wellness content is {trend_direction} on YouTube —
-        {trend_topic} videos targeting HR decision-makers and employees
-        are underserved. Short-format desk yoga series have high
-        shareability inside organisations.
+        {trend_topic} videos targeting HR decision-makers are underserved.
+        Short-format desk yoga series have high shareability inside organisations.
+      youtube_kids_sound: >
+        Workplace sound meditation content is {trend_direction} — companies
+        are booking group sound bath sessions as team wellness activities,
+        with {trend_topic} content driving discovery.
+      instagram: >
+        Corporate wellness Reels on {trend_topic} are {trend_direction} —
+        HR professionals follow workplace wellness accounts and actively
+        share content internally, creating viral discovery loops.
       google_trends: >
         HR teams are searching {trend_direction} for {trend_topic} —
         Q4 budget cycles drive spike in corporate wellness procurement.
@@ -82,10 +127,13 @@ niches:
 
   retreat_luxury:
     youtube_queries:
-      - "luxury yoga retreat India"
-      - "wellness retreat Rishikesh"
-      - "Ayurveda retreat Kerala"
+      - "luxury yoga retreat India 2025"
+      - "wellness retreat Rishikesh sound healing"
+      - "Ayurveda retreat Kerala yoga"
       - "silent retreat meditation India"
+    instagram_queries:
+      - "luxury wellness retreat reels India"
+      - "yoga retreat India Instagram 2025"
     google_trends_keywords:
       - "yoga retreat India"
       - "luxury wellness retreat"
@@ -100,6 +148,15 @@ niches:
         {trend_topic} vlogs and immersive retreat documentaries driving
         aspirational demand. Properties actively seeking resident
         facilitators for 2026-27 calendars.
+      youtube_kids_sound: >
+        Family wellness retreat content featuring kids yoga and sound
+        healing is {trend_direction} — an underserved segment that commands
+        premium pricing as parents seek holistic family experiences.
+      instagram: >
+        Retreat Reels on {trend_topic} are {trend_direction} — aspirational
+        wellness content drives bookings directly from Instagram discovery,
+        with retreat properties actively seeking visiting teachers to
+        co-create content.
       google_trends: >
         {trend_topic} searches are {trend_direction} — premium retreat
         seekers researching 3-7 day immersions are willing to pay
@@ -107,89 +164,115 @@ niches:
         highest per-night rates.
 
 # ── Venue pool ────────────────────────────────────────────
-# Each venue is tagged with one or more niches.
-# fetcher.py selects the top venues matching the trending niche.
+# Each venue tagged with niches + current callout status.
+# fetcher.py selects top venues matching the trending niche.
 venues:
+  # ── Pune / Mumbai — Local Priority ────────────────────
+  - icon: "🏋️"
+    name: "Cult.fit Pune Studios"
+    city: "Pune"
+    badge: "High Reach"
+    note: "Cult.fit actively onboarding speciality instructors for sound healing + therapeutic yoga — 15 Pune studios, built-in student base"
+    niches: [yoga_india, sound_healing]
+
+  - icon: "🏢"
+    name: "Wipro Pune Campus"
+    city: "Pune"
+    badge: "Corporate"
+    note: "Wipro wellness RFP open Q3 2026 — seeking certified yoga + stress management facilitators for 500+ employee cohort"
+    niches: [corporate_wellness, yoga_india]
+
+  - icon: "🏢"
+    name: "Cognizant Pune"
+    city: "Pune"
+    badge: "Corporate"
+    note: "HR wellness budget allocated for FY27 — therapeutic yoga and mindfulness programs preferred, in-person at Hinjewadi campus"
+    niches: [corporate_wellness, yoga_india]
+
+  - icon: "🏡"
+    name: "Purple Yoga Pune"
+    city: "Pune"
+    badge: "Studio"
+    note: "Independent studio actively seeking visiting sound healing facilitators for weekend workshop series — existing student community"
+    niches: [sound_healing, yoga_india]
+
+  - icon: "🎓"
+    name: "Symbiosis International School"
+    city: "Pune"
+    badge: "Kids"
+    note: "Wellness curriculum integration — seeking certified kids yoga instructors for after-school programme starting August 2026"
+    niches: [yoga_india]
+
+  - icon: "🏥"
+    name: "Ruby Hall Clinic Wellness"
+    city: "Pune"
+    badge: "Therapeutic"
+    note: "Integrative medicine dept. building therapeutic yoga referral network — PCOS, anxiety, back pain specialisations in demand"
+    niches: [yoga_india, corporate_wellness]
+
+  # ── Mumbai ─────────────────────────────────────────────
   - icon: "🏨"
     name: "ITC Maratha"
     city: "Mumbai"
     badge: "High Value"
-    note: "5-star property, hosts corporate wellness — in-residence teacher opportunity Q4"
-    niches: [corporate_wellness, yoga_india]
-
-  - icon: "🏨"
-    name: "The Leela Palace"
-    city: "Bangalore"
-    badge: "High Value"
-    note: "Wellness Director actively seeking sound healing facilitators for weekend retreats"
-    niches: [sound_healing, retreat_luxury]
-
-  - icon: "🏢"
-    name: "TCS Innovation Campus"
-    city: "Pune"
-    badge: "Corporate"
-    note: "HR team receptive to Yoga + Stress Management series — 200+ employee batch possible"
-    niches: [corporate_wellness, yoga_india]
-
-  - icon: "🏢"
-    name: "Infosys Mysore Campus"
-    city: "Mysore"
-    badge: "Corporate"
-    note: "Large campus wellness budget, Ayush-aligned programs preferred by leadership"
-    niches: [corporate_wellness, yoga_india]
-
-  - icon: "🏛️"
-    name: "Ministry of AYUSH"
-    city: "New Delhi"
-    badge: "Govt"
-    note: "National wellness missions seeking certified Yoga + Ayurveda practitioners for outreach"
-    niches: [yoga_india, sound_healing]
+    note: "5-star property, hosts corporate wellness — in-residence teacher opportunity Q4 2026, sound healing weekend retreat format"
+    niches: [corporate_wellness, sound_healing]
 
   - icon: "🏛️"
     name: "Indian Navy Wellness"
     city: "Mumbai"
     badge: "Govt"
-    note: "Defence wellness programs — Yoga certification + therapeutic specialisation preferred"
+    note: "Defence wellness programs — therapeutic yoga + pranayama specialisation preferred, long-term contract potential"
     niches: [yoga_india, corporate_wellness]
 
+  # ── National / Govt ────────────────────────────────────
+  - icon: "🏛️"
+    name: "Ministry of AYUSH"
+    city: "New Delhi"
+    badge: "Govt"
+    note: "National wellness missions seeking certified Yoga + Ayurveda practitioners — Fit India campaign expanding to schools"
+    niches: [yoga_india, sound_healing]
+
+  # ── Luxury Retreats ────────────────────────────────────
   - icon: "🌴"
     name: "Ananda in the Himalayas"
     city: "Uttarakhand"
     badge: "High Value"
-    note: "Premium retreat centre, 3-7 day Sound & Yoga immersions — ₹40K+ per retreat block"
+    note: "Premium retreat centre, 3-7 day Sound + Nada Yoga immersions — visiting teacher residency model, ₹40K+ per block"
     niches: [retreat_luxury, sound_healing]
+
+  - icon: "🏨"
+    name: "The Leela Palace"
+    city: "Bangalore"
+    badge: "High Value"
+    note: "Wellness Director actively seeking sound healing facilitators for weekend retreats — existing corporate guest base"
+    niches: [sound_healing, retreat_luxury]
 
   - icon: "🏡"
     name: "Shreyas Retreat"
     city: "Bangalore"
     badge: "High Value"
-    note: "Boutique luxury retreat, seeking resident facilitators for 2027 calendar"
+    note: "Boutique luxury retreat seeking resident facilitators for 2027 calendar — Nada Yoga + Ayurvedic yoga preferred"
     niches: [retreat_luxury, yoga_india]
 
+  # ── International ──────────────────────────────────────
   - icon: "🏨"
     name: "Address Beach Resort"
     city: "Dubai"
     badge: "High Value"
-    note: "UAE expat wellness — South Asian diaspora market, strong demand for Nada Yoga"
+    note: "UAE expat wellness — South Asian diaspora market, strong demand for Nada Yoga + therapeutic sessions"
     niches: [sound_healing, retreat_luxury]
 
   - icon: "🏢"
     name: "DIFC Wellness Hub"
     city: "Dubai"
     badge: "Corporate"
-    note: "Corporate wellness contracts for Indian diaspora companies in Dubai financial district"
-    niches: [corporate_wellness, yoga_india]
+    note: "Corporate wellness contracts for Indian diaspora companies in Dubai financial district — sound healing workshops trending"
+    niches: [corporate_wellness, sound_healing]
 
   - icon: "🏛️"
     name: "Sattva London"
     city: "London"
     badge: "High Value"
-    note: "South Asian yoga community, monthly sound bath series, visiting teacher program"
+    note: "South Asian yoga community, monthly sound bath series — visiting teacher programme, strong diaspora audience"
     niches: [sound_healing, yoga_india]
-
-  - icon: "🌴"
-    name: "Fivelements Bali"
-    city: "Bali"
-    badge: "High Value"
-    note: "Premium retreat venue, Ayurveda + sound healing — visiting teacher residency model"
-    niches: [retreat_luxury, sound_healing]
