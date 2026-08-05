@@ -207,16 +207,81 @@ def _format(template: str, trend_topic: str, trend_direction: str) -> str:
 
 def _select_venues(cfg: dict, niche: str, max_venues: int = _MAX_VENUES) -> list[dict]:
     """
-    Return venues from the config pool that match *niche*, stripped of the
-    internal 'niches' tag before returning.  Primary niche matches come first.
+    Return venues matching *niche*, geographically interleaved so every region
+    (India metros, Middle East, Europe, SE Asia) is represented.
     """
     all_venues = cfg.get("venues", [])
-    primary   = [v for v in all_venues if v.get("niches", [])[0:1] == [niche]]
-    secondary = [v for v in all_venues if niche in v.get("niches", []) and v not in primary]
-    selected  = (primary + secondary)[:max_venues]
+    matched = [v for v in all_venues if niche in v.get("niches", [])]
+
+    # Assign region bucket based on city
+    _REGION_ORDER = ["India", "Middle East", "Europe", "SE Asia"]
+    _MIDDLE_EAST  = {"Dubai", "Abu Dhabi", "Riyadh", "Doha", "Muscat"}
+    _EUROPE       = {"London", "Amsterdam", "Berlin", "Paris", "Zurich", "Barcelona", "Vienna"}
+    _SE_ASIA      = {"Bangkok", "Bali", "Singapore", "Phuket", "Chiang Mai", "Koh Samui"}
+
+    def region(v: dict) -> str:
+        city = v.get("city", "")
+        if city in _MIDDLE_EAST: return "Middle East"
+        if city in _EUROPE:      return "Europe"
+        if city in _SE_ASIA:     return "SE Asia"
+        return "India"
+
+    # Sort India venues: primaries (niche[0] matches) before secondaries, then interleave cities
+    india   = sorted(matched, key=lambda v: (0 if v.get("niches", [])[0:1] == [niche] else 1, v.get("city", "")))
+    intl_me = [v for v in matched if region(v) == "Middle East"]
+    intl_eu = [v for v in matched if region(v) == "Europe"]
+    intl_sea= [v for v in matched if region(v) == "SE Asia"]
+
+    # Separate India venues into distinct cities, interleave
+    india_by_city: dict[str, list] = {}
+    for v in india:
+        if region(v) == "India":
+            india_by_city.setdefault(v.get("city", "Other"), []).append(v)
+
+    # Round-robin across India cities to ensure spread
+    india_interleaved: list[dict] = []
+    city_lists = list(india_by_city.values())
+    while any(city_lists) and len(india_interleaved) < max_venues:
+        for cl in city_lists:
+            if cl:
+                india_interleaved.append(cl.pop(0))
+            if len(india_interleaved) >= max_venues:
+                break
+
+    # Interleave: 2 India, 1 intl per cycle until max_venues
+    result: list[dict] = []
+    ia, me, eu, sea = iter(india_interleaved), iter(intl_me), iter(intl_eu), iter(intl_sea)
+    intl_cycle = [me, eu, sea]
+    intl_idx   = 0
+    india_count = 0
+    while len(result) < max_venues:
+        if india_count < 2:
+            v = next(ia, None)
+            if v:
+                result.append(v)
+                india_count += 1
+                continue
+        # international turn
+        added_intl = False
+        for _ in range(len(intl_cycle)):
+            v = next(intl_cycle[intl_idx % len(intl_cycle)], None)
+            intl_idx += 1
+            if v:
+                result.append(v)
+                added_intl = True
+                break
+        india_count = 0
+        if not added_intl:
+            # exhaust remaining India venues
+            v = next(ia, None)
+            if v:
+                result.append(v)
+            else:
+                break
+
     return [
-        {k: v for k, v in venue.items() if k != "niches"}
-        for venue in selected
+        {k: val for k, val in venue.items() if k != "niches"}
+        for venue in result[:max_venues]
     ]
 
 

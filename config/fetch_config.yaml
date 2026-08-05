@@ -164,115 +164,261 @@ niches:
         highest per-night rates.
 
 # ── Venue pool ────────────────────────────────────────────
-# Each venue tagged with niches + current callout status.
-# fetcher.py selects top venues matching the trending niche.
+# Geographically balanced: India metros + Middle East + Europe + SE Asia
+# fetcher.py interleaves by region so every geography is represented.
 venues:
-  # ── Pune / Mumbai — Local Priority ────────────────────
-  - icon: "🏋️"
-    name: "Cult.fit Pune Studios"
-    city: "Pune"
-    badge: "High Reach"
-    note: "Cult.fit actively onboarding speciality instructors for sound healing + therapeutic yoga — 15 Pune studios, built-in student base"
+
+  # ── Bangalore ──────────────────────────────────────────
+  - icon: "🏨"
+    name: "The Leela Palace"
+    city: "Bangalore"
+    badge: "High Value"
+    note: "Wellness Director actively seeking sound healing facilitators for weekend retreats — curated guest programme, strong corporate base"
     niches: [yoga_india, sound_healing]
 
-  - icon: "🏢"
-    name: "Wipro Pune Campus"
-    city: "Pune"
-    badge: "Corporate"
-    note: "Wipro wellness RFP open Q3 2026 — seeking certified yoga + stress management facilitators for 500+ employee cohort"
-    niches: [corporate_wellness, yoga_india]
-
-  - icon: "🏢"
-    name: "Cognizant Pune"
-    city: "Pune"
-    badge: "Corporate"
-    note: "HR wellness budget allocated for FY27 — therapeutic yoga and mindfulness programs preferred, in-person at Hinjewadi campus"
-    niches: [corporate_wellness, yoga_india]
-
   - icon: "🏡"
-    name: "Purple Yoga Pune"
-    city: "Pune"
-    badge: "Studio"
-    note: "Independent studio actively seeking visiting sound healing facilitators for weekend workshop series — existing student community"
-    niches: [sound_healing, yoga_india]
+    name: "Shreyas Retreat"
+    city: "Bangalore"
+    badge: "High Value"
+    note: "Boutique luxury retreat seeking resident facilitators for 2027 calendar — Nada Yoga + Ayurvedic yoga sequences preferred"
+    niches: [retreat_luxury, yoga_india]
 
-  - icon: "🎓"
-    name: "Symbiosis International School"
-    city: "Pune"
-    badge: "Kids"
-    note: "Wellness curriculum integration — seeking certified kids yoga instructors for after-school programme starting August 2026"
-    niches: [yoga_india]
+  - icon: "🏢"
+    name: "Infosys Bangalore Campus"
+    city: "Bangalore"
+    badge: "Corporate"
+    note: "Infosys global wellness initiative — therapeutic yoga and mindfulness for 20,000+ Bangalore employees, FY27 RFP open"
+    niches: [corporate_wellness, yoga_india]
 
-  - icon: "🏥"
-    name: "Ruby Hall Clinic Wellness"
-    city: "Pune"
-    badge: "Therapeutic"
-    note: "Integrative medicine dept. building therapeutic yoga referral network — PCOS, anxiety, back pain specialisations in demand"
-    niches: [yoga_india, corporate_wellness]
+  - icon: "🏋️"
+    name: "Cult.fit Bangalore"
+    city: "Bangalore"
+    badge: "High Reach"
+    note: "Cult.fit onboarding speciality instructors — sound healing + therapeutic yoga, 25+ Bangalore studios, built-in student base"
+    niches: [yoga_india, sound_healing]
 
   # ── Mumbai ─────────────────────────────────────────────
   - icon: "🏨"
     name: "ITC Maratha"
     city: "Mumbai"
     badge: "High Value"
-    note: "5-star property, hosts corporate wellness — in-residence teacher opportunity Q4 2026, sound healing weekend retreat format"
-    niches: [corporate_wellness, sound_healing]
+    note: "5-star corporate wellness host — in-residence teacher opportunity Q4 2026, sound healing weekend retreat format, premium pricing"
+    niches: [yoga_india, sound_healing]
 
   - icon: "🏛️"
     name: "Indian Navy Wellness"
     city: "Mumbai"
     badge: "Govt"
-    note: "Defence wellness programs — therapeutic yoga + pranayama specialisation preferred, long-term contract potential"
+    note: "Defence wellness programs — therapeutic yoga + pranayama specialisation preferred, long-term institutional contract potential"
     niches: [yoga_india, corporate_wellness]
 
-  # ── National / Govt ────────────────────────────────────
+  - icon: "🏢"
+    name: "Deloitte Mumbai"
+    city: "Mumbai"
+    badge: "Corporate"
+    note: "Big-4 firm wellness programme — seeking certified yoga facilitators for BKC office, quarterly retreat format preferred"
+    niches: [corporate_wellness, yoga_india]
+
+  # ── Hyderabad ──────────────────────────────────────────
+  - icon: "🏢"
+    name: "Microsoft Hyderabad Campus"
+    city: "Hyderabad"
+    badge: "Corporate"
+    note: "Microsoft India wellness team actively building FY27 programme — yoga + sound meditation for 10,000+ employee campus at Gachibowli"
+    niches: [corporate_wellness, yoga_india]
+
+  - icon: "🏢"
+    name: "Amazon HYD Campus"
+    city: "Hyderabad"
+    badge: "Corporate"
+    note: "Amazon India wellness RFP open — therapeutic yoga and stress management for Nanakramguda campus, structured monthly series preferred"
+    niches: [corporate_wellness, yoga_india]
+
+  - icon: "🌴"
+    name: "Novotel Hyderabad Convention"
+    city: "Hyderabad"
+    badge: "High Value"
+    note: "Convention hotel hosting corporate wellness summits — seeking visiting yoga + sound healing facilitators for pre-conference sessions"
+    niches: [yoga_india, sound_healing]
+
+  # ── Delhi / NCR ─────────────────────────────────────────
   - icon: "🏛️"
     name: "Ministry of AYUSH"
     city: "New Delhi"
     badge: "Govt"
-    note: "National wellness missions seeking certified Yoga + Ayurveda practitioners — Fit India campaign expanding to schools"
+    note: "National wellness missions seeking certified Yoga + Ayurveda practitioners — Fit India schools programme expanding nationwide"
     niches: [yoga_india, sound_healing]
 
-  # ── Luxury Retreats ────────────────────────────────────
+  - icon: "🏨"
+    name: "The Oberoi New Delhi"
+    city: "New Delhi"
+    badge: "High Value"
+    note: "Luxury property seeking resident yoga + sound healing facilitator — diplomatic and corporate guest clientele, premium rate structure"
+    niches: [yoga_india, sound_healing, retreat_luxury]
+
+  - icon: "🏢"
+    name: "Google Delhi Office"
+    city: "New Delhi"
+    badge: "Corporate"
+    note: "Google India wellness team building holistic programme — therapeutic yoga, sound meditation, mindfulness for Gurugram campus"
+    niches: [corporate_wellness, yoga_india]
+
+  # ── Chennai ─────────────────────────────────────────────
+  - icon: "🏥"
+    name: "Apollo Hospitals Wellness"
+    city: "Chennai"
+    badge: "Therapeutic"
+    note: "Apollo integrative health expanding yoga therapy referral network — PCOS, cardiac rehab, oncology support specialisations in demand"
+    niches: [yoga_india, corporate_wellness]
+
+  - icon: "🏢"
+    name: "HCL Chennai Campus"
+    city: "Chennai"
+    badge: "Corporate"
+    note: "HCL wellness initiative — therapeutic yoga and pranayama for Sholinganallur campus, Ayush-aligned programme preferred"
+    niches: [corporate_wellness, yoga_india]
+
+  # ── Pune ───────────────────────────────────────────────
+  - icon: "🏋️"
+    name: "Cult.fit Pune Studios"
+    city: "Pune"
+    badge: "High Reach"
+    note: "Cult.fit onboarding speciality instructors — sound healing + therapeutic yoga, 15 Pune studios, immediate openings"
+    niches: [yoga_india, sound_healing]
+
+  - icon: "🏥"
+    name: "Ruby Hall Clinic Wellness"
+    city: "Pune"
+    badge: "Therapeutic"
+    note: "Integrative medicine dept. building therapeutic yoga referral network — PCOS, anxiety, back pain specialisations in active demand"
+    niches: [yoga_india, corporate_wellness]
+
+  - icon: "🎓"
+    name: "Symbiosis International School"
+    city: "Pune"
+    badge: "Kids"
+    note: "Wellness curriculum integration — certified kids yoga instructors needed for after-school programme starting Aug 2026"
+    niches: [yoga_india]
+
+  # ── Luxury India Retreats ──────────────────────────────
   - icon: "🌴"
     name: "Ananda in the Himalayas"
     city: "Uttarakhand"
     badge: "High Value"
-    note: "Premium retreat centre, 3-7 day Sound + Nada Yoga immersions — visiting teacher residency model, ₹40K+ per block"
+    note: "Premium retreat centre — 3-7 day Sound + Nada Yoga immersions, visiting teacher residency model, ₹40K+ per retreat block"
     niches: [retreat_luxury, sound_healing]
 
-  - icon: "🏨"
-    name: "The Leela Palace"
-    city: "Bangalore"
+  - icon: "🌿"
+    name: "Swaswara by CGH Earth"
+    city: "Gokarna"
     badge: "High Value"
-    note: "Wellness Director actively seeking sound healing facilitators for weekend retreats — existing corporate guest base"
-    niches: [sound_healing, retreat_luxury]
-
-  - icon: "🏡"
-    name: "Shreyas Retreat"
-    city: "Bangalore"
-    badge: "High Value"
-    note: "Boutique luxury retreat seeking resident facilitators for 2027 calendar — Nada Yoga + Ayurvedic yoga preferred"
+    note: "Ayurveda + yoga retreat on Karnataka coast — resident facilitator opportunity 2026-27, specialised therapeutic sequences valued"
     niches: [retreat_luxury, yoga_india]
 
-  # ── International ──────────────────────────────────────
+  # ── Middle East ────────────────────────────────────────
   - icon: "🏨"
     name: "Address Beach Resort"
     city: "Dubai"
     badge: "High Value"
-    note: "UAE expat wellness — South Asian diaspora market, strong demand for Nada Yoga + therapeutic sessions"
-    niches: [sound_healing, retreat_luxury]
+    note: "UAE expat wellness hotspot — South Asian diaspora market, strong demand for Nada Yoga + therapeutic sessions, premium rates"
+    niches: [yoga_india, sound_healing, retreat_luxury]
 
   - icon: "🏢"
     name: "DIFC Wellness Hub"
     city: "Dubai"
     badge: "Corporate"
-    note: "Corporate wellness contracts for Indian diaspora companies in Dubai financial district — sound healing workshops trending"
-    niches: [corporate_wellness, sound_healing]
+    note: "Corporate wellness hub for Indian diaspora firms — sound healing workshops trending, monthly series format preferred"
+    niches: [corporate_wellness, sound_healing, yoga_india]
 
+  - icon: "🏨"
+    name: "Jumeirah Al Naseem"
+    city: "Dubai"
+    badge: "High Value"
+    note: "Luxury resort seeking resident wellness facilitator — yoga + sound healing for international guests, visiting teacher programme open"
+    niches: [retreat_luxury, sound_healing, yoga_india]
+
+  - icon: "🌴"
+    name: "Anantara Eastern Mangroves"
+    city: "Abu Dhabi"
+    badge: "High Value"
+    note: "Abu Dhabi wellness retreat — visiting sound healing facilitator programme, South Asian expat guest base, quarterly residencies"
+    niches: [retreat_luxury, sound_healing, yoga_india]
+
+  - icon: "🏢"
+    name: "ADNOC Wellness Centre"
+    city: "Abu Dhabi"
+    badge: "Corporate"
+    note: "National oil company wellness programme — large Indian expat workforce, therapeutic yoga + stress management, structured annual contract"
+    niches: [corporate_wellness, yoga_india]
+
+  # ── Europe ─────────────────────────────────────────────
   - icon: "🏛️"
     name: "Sattva London"
     city: "London"
     badge: "High Value"
-    note: "South Asian yoga community, monthly sound bath series — visiting teacher programme, strong diaspora audience"
-    niches: [sound_healing, yoga_india]
+    note: "South Asian yoga community hub — monthly sound bath series, visiting teacher programme, strong British-Indian diaspora audience"
+    niches: [sound_healing, yoga_india, retreat_luxury]
+
+  - icon: "🧘"
+    name: "Triyoga London"
+    city: "London"
+    badge: "Studio"
+    note: "UK's leading yoga studio network — visiting teacher workshops, strong appetite for Indian traditional lineage + sound healing"
+    niches: [yoga_india, sound_healing]
+
+  - icon: "🌿"
+    name: "Yoga Vidya Bad Meinberg"
+    city: "Berlin"
+    badge: "High Value"
+    note: "Europe's largest yoga retreat centre — visiting teacher programme, 50,000 annual students, traditional yoga + Ayurveda specialisations prized"
+    niches: [retreat_luxury, yoga_india, sound_healing]
+
+  - icon: "🏨"
+    name: "SHA Wellness Clinic"
+    city: "Amsterdam"
+    badge: "High Value"
+    note: "Premium European wellness clinic — integrating Indian healing modalities, visiting Nada Yoga + therapeutic specialists in demand 2026-27"
+    niches: [retreat_luxury, sound_healing, yoga_india]
+
+  # ── SE Asia / Thailand ─────────────────────────────────
+  - icon: "🌴"
+    name: "Kamalaya Koh Samui"
+    city: "Koh Samui"
+    badge: "High Value"
+    note: "Asia's top wellness retreat — visiting facilitator programme for Nada Yoga + sound healing, international premium guest base"
+    niches: [retreat_luxury, sound_healing, yoga_india]
+
+  - icon: "🌿"
+    name: "Chiva-Som Hua Hin"
+    city: "Bangkok"
+    badge: "High Value"
+    note: "World-renowned wellness resort — expanding yoga + sound healing programme, visiting teacher residencies open for 2027"
+    niches: [retreat_luxury, sound_healing, yoga_india]
+
+  - icon: "🏨"
+    name: "Anantara Bophut Resort"
+    city: "Koh Samui"
+    badge: "High Value"
+    note: "Luxury Thai resort — sound healing + yoga immersion weekends trending with Indian and European guests, facilitator residency available"
+    niches: [retreat_luxury, sound_healing, yoga_india]
+
+  - icon: "🌴"
+    name: "Fivelements Bali"
+    city: "Bali"
+    badge: "High Value"
+    note: "Premium Bali retreat — Ayurveda + sound healing + yoga, visiting teacher residency model, strong Indian wellness tourism market"
+    niches: [retreat_luxury, sound_healing, yoga_india]
+
+  - icon: "🏨"
+    name: "Raffles Singapore Wellness"
+    city: "Singapore"
+    badge: "High Value"
+    note: "Singapore flagship luxury hotel — growing South Asian corporate wellness market, Indian expat diaspora, quarterly visiting teacher programme"
+    niches: [retreat_luxury, yoga_india, sound_healing]
+
+  - icon: "🏢"
+    name: "CapitaLand Wellness Singapore"
+    city: "Singapore"
+    badge: "Corporate"
+    note: "Singapore real estate conglomerate — workplace wellness programme for large Indian expat workforce, therapeutic yoga + meditation preferred"
+    niches: [corporate_wellness, yoga_india]
