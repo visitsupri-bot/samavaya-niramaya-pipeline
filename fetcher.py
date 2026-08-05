@@ -471,11 +471,12 @@ def fetch_opportunity(
     # Venues filtered by the ACTIVE NICHE so they match the market theme
     venues = _select_venues(cfg, niche)
 
+    # Note: market_headline and market_context are NOT set here.
+    # They come from the weekly market_theme in content.yaml via rotate_payload().
+    # We do NOT set _live_market_headline sentinel — rotate_payload always applies the weekly theme.
     return {
-        "market_headline":       "",   # set by rotate_payload from weekly theme — not here
-        "_live_market_headline": True,  # sentinel: prevents static rotation from overwriting
-        "trends":                trends,
-        "venues":                venues,
+        "trends":  trends,
+        "venues":  venues,
         "trend_data": {
             "youtube_count": len(yt1_results) + len(yt2_results) + len(ig_results),
             "trends_count":  len(trend_results),

@@ -114,12 +114,10 @@ def rotate_payload(payload: dict, day_of_year: int, config: dict) -> dict:
         rotated_source = pick_by_day(wisdom_sources, day_of_year)
         p["sections"]["wisdom"]["_featured_source"] = rotated_source
 
-    # Rotate market headline weekly — use market_themes[week_of_year % len]
-    # market_themes replaces market_headlines; each theme has headline + niche + context
+    # Apply weekly market theme — always overrides whatever the fetcher put there
+    # The weekly theme (headline + context) is the authoritative Market Radar signal
     themes = config["content"].get("market_themes", [])
-    opp = p.get("sections", {}).get("opportunity", {})
-    live_headline = opp.get("_live_market_headline")
-    if themes and "opportunity" in p.get("sections", {}) and not live_headline:
+    if themes and "opportunity" in p.get("sections", {}):
         week_of_year = (day_of_year - 1) // 7
         theme = themes[week_of_year % len(themes)]
         p["sections"]["opportunity"]["market_headline"] = theme["headline"]
