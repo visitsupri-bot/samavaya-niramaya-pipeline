@@ -23,12 +23,41 @@ wisdom_sources:
   - upanishads
   - hatha_yoga_pradipika
 
-market_headlines:
-  - "Wellness tourism grows 15% YoY — yoga leads"
-  - "Corporate wellness budgets up 22% in FY26"
-  - "Online yoga subscriptions plateau — live sessions surge"
-  - "Prenatal & postnatal yoga demand at 5-year high"
-  - "Ayurveda + yoga combos command 30% premium"
-  - "60+ demographic is fastest-growing yoga segment"
-  - "Trauma-informed yoga certifications in high demand"
-  - "Sound healing + yoga fusion trending across metros"
+# ── Market Radar — Weekly Rotation ───────────────────────
+# Each entry is one week's market focus.
+# 'niche' maps to a niche in fetch_config.yaml — drives which YouTube
+# queries are fired AND which venues are shown. The whole Opportunity
+# tab (Market Radar → trend cards → venues) tells one coherent story.
+# Rotation: week_of_year % len(market_themes) — changes weekly, not daily.
+market_themes:
+  - headline: "Sound healing + yoga fusion is the fastest-growing wellness category across Indian metros"
+    niche: sound_healing
+    context: "Corporate teams, luxury hotels and retreat centres are booking sound bath sessions at record rates. No Indian teacher has systematised Nada Yoga + sound healing at scale — first-mover advantage available."
+
+  - headline: "Corporate wellness budgets up 22% in FY27 — structured yoga programmes in high demand"
+    niche: corporate_wellness
+    context: "IT campuses across Hyderabad, Bangalore and Pune have open wellness RFPs. Companies prefer certified facilitators with therapeutic specialisations over generic fitness instructors."
+
+  - headline: "Therapeutic yoga for anxiety, PCOS and back pain — condition-specific demand exploding"
+    niche: yoga_india
+    context: "Searches for condition-specific yoga have outpaced generic 'yoga class near me' by 3:1 in Tier-1 cities. Hospitals and clinics are actively building yoga therapy referral networks."
+
+  - headline: "Luxury wellness retreats seeking resident Indian yoga teachers — premium rates available"
+    niche: retreat_luxury
+    context: "Properties in Thailand, Bali, UAE and Europe are actively recruiting visiting facilitators for 2026-27 calendars. Indian lineage yoga + Nada Yoga commands premium rates in international markets."
+
+  - headline: "Kids yoga demand surging — schools and parents seeking certified structured programmes"
+    niche: yoga_india
+    context: "After-school wellness programmes featuring yoga and mindfulness are being adopted by international schools across Pune, Bangalore and Mumbai. Exam-season demand spikes Feb-Mar and Oct-Nov."
+
+  - headline: "Ayurveda + yoga combinations command 30% premium — dosha-based content going global"
+    niche: yoga_india
+    context: "Dosha-based yoga content averages 85K views per video globally. No major Indian teacher has claimed this YouTube niche — content gap is wide and the audience is international."
+
+  - headline: "UAE and Southeast Asia wellness tourism booming — Indian teachers in high demand"
+    niche: retreat_luxury
+    context: "South Asian diaspora in Dubai, Singapore and Bangkok is driving premium wellness bookings. Thai retreat properties and UAE luxury hotels are specifically seeking Indian yoga + sound healing specialists."
+
+  - headline: "Sound healing and yoga fusion trending in Europe — UK, Germany and Netherlands markets open"
+    niche: sound_healing
+    context: "European wellness centres are integrating Indian healing modalities at scale. Triyoga London, Yoga Vidya Germany and SHA Wellness Netherlands are actively seeking visiting Indian facilitators."

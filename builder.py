@@ -114,12 +114,16 @@ def rotate_payload(payload: dict, day_of_year: int, config: dict) -> dict:
         rotated_source = pick_by_day(wisdom_sources, day_of_year)
         p["sections"]["wisdom"]["_featured_source"] = rotated_source
 
-    # Rotate market headline — only if not already set by live fetcher
-    headlines = config["content"].get("market_headlines", [])
+    # Rotate market headline weekly — use market_themes[week_of_year % len]
+    # market_themes replaces market_headlines; each theme has headline + niche + context
+    themes = config["content"].get("market_themes", [])
     opp = p.get("sections", {}).get("opportunity", {})
     live_headline = opp.get("_live_market_headline")
-    if headlines and "opportunity" in p.get("sections", {}) and not live_headline:
-        p["sections"]["opportunity"]["market_headline"] = pick_by_day(headlines, day_of_year)
+    if themes and "opportunity" in p.get("sections", {}) and not live_headline:
+        week_of_year = (day_of_year - 1) // 7
+        theme = themes[week_of_year % len(themes)]
+        p["sections"]["opportunity"]["market_headline"] = theme["headline"]
+        p["sections"]["opportunity"]["market_context"]  = theme.get("context", "")
 
     # Inject schedule from config
     p["sections"]["schedule"] = {
@@ -153,13 +157,22 @@ def build(target_date: date, source_json: Path | None) -> dict:
     base["generated_at"] = datetime.now(timezone.utc).isoformat()
     base["date"] = target_date.isoformat()
 
-    # ── Optional: enrich opportunity section with live trend data ──
+    # ── Derive active niche from weekly market theme ───────
+    themes = config["content"].get("market_themes", [])
+    week_of_year = (day_of_year - 1) // 7
+    active_theme = themes[week_of_year % len(themes)] if themes else {}
+    active_niche   = active_theme.get("niche", "yoga_india")
+    active_context = active_theme.get("context", "")
+    logger.info("Active market theme week=%d niche=%r", week_of_year, active_niche)
+
+    # ── Enrich opportunity section with live trend data ────
     youtube_api_key = os.environ.get("YOUTUBE_API_KEY", "")
     if _fetcher is not None and youtube_api_key:
-        niche = config["content"].get("default_niche", "yoga_india")
-        logger.info("Fetching live opportunity data for niche=%r", niche)
+        logger.info("Fetching live opportunity data for niche=%r", active_niche)
         try:
-            opportunity_data = _fetcher.fetch_opportunity(youtube_api_key, niche)
+            opportunity_data = _fetcher.fetch_opportunity(
+                youtube_api_key, active_niche, market_context=active_context
+            )
             if opportunity_data:
                 base.setdefault("sections", {}).setdefault("opportunity", {}).update(
                     opportunity_data

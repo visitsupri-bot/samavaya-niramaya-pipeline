@@ -312,15 +312,28 @@ def _make_hashtags(queries: list[str], count: int = 5) -> list[str]:
     return tags
 
 
-def fetch_opportunity(api_key: str, niche: str) -> Optional[dict]:
+def fetch_opportunity(
+    api_key: str,
+    niche: str,
+    *,
+    market_context: str = "",
+) -> Optional[dict]:
     """
-    Assemble a rich opportunity dict with 4 distinct trend cards:
-      1. YouTube India   — what's trending in yoga/wellness searches
-      2. Kids & Sound    — underserved content niche signal
-      3. Instagram India — Reels/short-form discovery angle
-      4. Google Trends   — search demand signal (or fallback insight)
-    Each card uses clean topic keywords, not raw video titles.
-    Returns None if all sources empty or niche unknown.
+    Assemble a cohesive opportunity dict where ALL 4 trend cards relate to the
+    same active niche (set by the weekly market theme in content.yaml).
+
+    Each card covers a DIFFERENT query from the niche's query list so they
+    each have a distinct topic. Cards:
+      1. YouTube India      — primary yoga/wellness search demand
+      2. YouTube Niche      — second distinct query (kids/sound/corporate/retreat angle)
+      3. Instagram India    — Reels/short-form content discovery angle
+      4. Google Trends      — search volume signal (or descriptive fallback)
+
+    market_context is the strategic 'why' from the weekly theme — shown as
+    the opportunity insight on Card 1 (the most important card).
+
+    Venues are filtered by the active niche so the whole tab is coherent:
+    corporate_wellness niche → corporate venues; sound_healing → retreat venues; etc.
     """
     cfg = _load_fetch_config()
     niche_cfg = cfg.get("niches", {}).get(niche)
@@ -328,154 +341,143 @@ def fetch_opportunity(api_key: str, niche: str) -> Optional[dict]:
         logger.warning("fetch_opportunity: unknown niche %r -- skipping", niche)
         return None
 
-    youtube_queries      = niche_cfg.get("youtube_queries", [])
-    instagram_queries    = niche_cfg.get("instagram_queries", [])
-    trends_keywords      = niche_cfg.get("google_trends_keywords", [])
-    opportunity_template = niche_cfg.get("opportunity_template", "")
-    platform_insights    = niche_cfg.get("platform_insights", {})
+    youtube_queries   = niche_cfg.get("youtube_queries", [])
+    instagram_queries = niche_cfg.get("instagram_queries", [])
+    trends_keywords   = niche_cfg.get("google_trends_keywords", [])
+    platform_insights = niche_cfg.get("platform_insights", {})
 
-    # Fetch live data
-    yt_results    = fetch_youtube_trends(api_key, youtube_queries)
-    ig_results    = fetch_youtube_trends(api_key, instagram_queries) if instagram_queries else []
+    # Assign distinct queries to each card so topics differ
+    # Card 1 = first primary query, Card 2 = second primary query (or instagram_queries[0])
+    card1_queries = youtube_queries[0:2] if youtube_queries else []
+    card2_queries = youtube_queries[2:4] if len(youtube_queries) > 2 else instagram_queries[0:2]
+    card3_queries = instagram_queries if instagram_queries else youtube_queries[4:6]
+
+    # Fetch live data — each batch uses its own focused queries
+    yt1_results = fetch_youtube_trends(api_key, card1_queries, max_results=5)
+    yt2_results = fetch_youtube_trends(api_key, card2_queries, max_results=5)
+    ig_results  = fetch_youtube_trends(api_key, card3_queries, max_results=5)
     trend_results = fetch_google_trends(trends_keywords)
 
-    if not yt_results and not ig_results and not trend_results:
+    if not yt1_results and not yt2_results and not ig_results and not trend_results:
         logger.info("fetch_opportunity: all sources empty for niche %r -- returning None", niche)
         return None
 
-    # ── Clean topic extraction ─────────────────────────────
-    # Use the most-searched QUERY as the topic (not the video title)
-    # Count how many results each query produced to find the dominant theme
-    query_counts: dict[str, int] = {}
-    for entry in yt_results:
-        q = entry.get("query", "")
-        query_counts[q] = query_counts.get(q, 0) + 1
-    for entry in ig_results:
-        q = entry.get("query", "")
-        query_counts[q] = query_counts.get(q, 0) + 1
-
-    top_query = max(query_counts, key=query_counts.get) if query_counts else (youtube_queries[0] if youtube_queries else niche)
-    trend_topic = _clean_topic(top_query)
-
-    # Google Trends topic overrides if available (more precise keyword signal)
-    if trend_results:
-        gt_topic = trend_results[0].get("keyword", "")
-        trend_topic = gt_topic.title() if gt_topic else trend_topic
-        is_rising = trend_results[0].get("is_rising", True)
-    else:
-        is_rising = True
+    # Overall trend direction from Google Trends if available, else assume upward
+    is_rising = trend_results[0].get("is_rising", True) if trend_results else True
     trend_direction = "upward" if is_rising else "stable"
-
-    # ── Market headline ────────────────────────────────────
-    market_headline = _format(opportunity_template, trend_topic, trend_direction)
-    if not market_headline:
-        market_headline = f"Growing demand for {trend_topic} — {trend_direction} opportunity in Indian wellness market"
 
     trends: list[dict] = []
 
-    # ── Card 1: YouTube India — primary wellness search trends ──
-    # Headline focuses on search volume signal, not video title
-    yt_topic_counts: dict[str, int] = {}
-    for e in yt_results:
-        q = e.get("query", "")
-        yt_topic_counts[q] = yt_topic_counts.get(q, 0) + 1
-    top_yt_queries = sorted(yt_topic_counts, key=yt_topic_counts.get, reverse=True)[:3]
-    yt_topics_str = " + ".join(_clean_topic(q) for q in top_yt_queries[:2])
-
-    yt_headline = (
-        f"{len(yt_results)} videos found for '{yt_topics_str}' — "
-        f"viewer demand is {trend_direction} on YouTube India"
-        if yt_results else
-        f"YouTube India: {trend_topic} content demand is {trend_direction}"
+    # ── Card 1: YouTube India — primary niche demand signal ──
+    c1_query = card1_queries[0] if card1_queries else niche.replace("_", " ")
+    c1_topic = _clean_topic(c1_query)
+    c1_count = len(yt1_results)
+    c1_headline = (
+        f"{c1_count} videos found for '{c1_topic}' — viewer demand is {trend_direction} on YouTube India"
+        if yt1_results else
+        f"YouTube India: '{c1_topic}' content demand is {trend_direction}"
     )
-    yt_hashtags = _make_hashtags(top_yt_queries + youtube_queries)
+    c1_hashtags = _make_hashtags(card1_queries + [c1_query])
+    # Use market_context as the opportunity insight for Card 1 (the strategic 'why')
+    c1_insight = market_context or _format(
+        platform_insights.get("youtube", ""), c1_topic, trend_direction
+    ) or f"'{c1_topic}' is {trend_direction} on YouTube India — authentic teacher-led content commands highest watch time."
 
     trends.append({
         "platform":    "YouTube India",
-        "headline":    yt_headline,
-        "hashtags":    yt_hashtags[:5],
-        "opportunity": _format(platform_insights.get("youtube", ""), trend_topic, trend_direction)
-                       or f"{trend_topic} is {trend_direction} on YouTube India — authentic teacher-led content commands highest watch time.",
+        "headline":    c1_headline,
+        "hashtags":    c1_hashtags[:5],
+        "opportunity": c1_insight,
     })
 
-    # ── Card 2: Kids & Sound Healing — underserved niche ──
-    ig_topic_counts: dict[str, int] = {}
-    for e in ig_results:
-        q = e.get("query", "")
-        ig_topic_counts[q] = ig_topic_counts.get(q, 0) + 1
-    top_ig_queries = sorted(ig_topic_counts, key=ig_topic_counts.get, reverse=True)[:2]
-    ig_topics_str = " + ".join(_clean_topic(q) for q in top_ig_queries[:2]) if top_ig_queries else "Kids Yoga & Sound Healing"
-
-    yt2_headline = (
-        f"{len(ig_results)} videos for '{ig_topics_str}' — "
-        f"Kids & Sound content {trend_direction} on YouTube India"
-        if ig_results else
-        f"Kids Yoga & Sound Healing content demand is {trend_direction} on YouTube India"
+    # ── Card 2: YouTube — second distinct niche angle ─────
+    c2_query = card2_queries[0] if card2_queries else (youtube_queries[1] if len(youtube_queries) > 1 else c1_query)
+    c2_topic = _clean_topic(c2_query)
+    c2_count = len(yt2_results)
+    c2_headline = (
+        f"{c2_count} videos found for '{c2_topic}' — {trend_direction} demand on YouTube India"
+        if yt2_results else
+        f"YouTube India: '{c2_topic}' content is {trend_direction}"
     )
-    yt2_hashtags = _make_hashtags(top_ig_queries + instagram_queries) or ["#KidsYoga", "#SoundHealing", "#YogaForKids", "#SoundBath"]
+    c2_hashtags = _make_hashtags(card2_queries)
+    c2_insight = _format(
+        platform_insights.get("youtube_kids_sound", "") or platform_insights.get("youtube", ""),
+        c2_topic, trend_direction
+    ) or f"'{c2_topic}' is an underserved niche on YouTube India with {trend_direction} viewer demand."
 
     trends.append({
-        "platform":    "YouTube — Kids & Sound",
-        "headline":    yt2_headline,
-        "hashtags":    yt2_hashtags[:5],
-        "opportunity": _format(platform_insights.get("youtube_kids_sound", ""), ig_topics_str, trend_direction)
-                       or f"Kids yoga and sound healing is {trend_direction} — underserved niche with high growth potential in India.",
+        "platform":    f"YouTube — {c2_topic}",
+        "headline":    c2_headline,
+        "hashtags":    c2_hashtags[:5],
+        "opportunity": c2_insight,
     })
 
     # ── Card 3: Instagram India — Reels discovery angle ───
-    # Build meaningful hashtags from Google Trends keywords (actual search terms)
+    c3_query = card3_queries[0] if card3_queries else c1_query
+    c3_topic = _clean_topic(c3_query)
+    c3_count = len(ig_results)
+    # Instagram hashtags come from Google Trends keywords (actual search terms people use)
     ig_hashtags = ["#" + kw.replace(" ", "").title()[:20] for kw in trends_keywords[:5]]
     if not ig_hashtags:
-        ig_hashtags = ["#YogaIndia", "#SoundHealing", "#TherapeuticYoga", "#KidsYoga", "#YogaNidra"]
-
-    # Headline focuses on content strategy, not a raw video title
-    ig_headline = (
-        f"Instagram India: '{trend_topic}' Reels are {trend_direction} — "
-        f"{len(ig_results) if ig_results else 'high'} videos signal strong short-form demand"
+        ig_hashtags = _make_hashtags(card3_queries)
+    c3_headline = (
+        f"Instagram India: '{c3_topic}' Reels are {trend_direction} "
+        f"— {c3_count} videos confirm short-form demand"
+        if ig_results else
+        f"Instagram India: '{c3_topic}' Reels content is {trend_direction} — content gap available"
     )
+    c3_insight = _format(
+        platform_insights.get("instagram", ""), c3_topic, trend_direction
+    ) or f"Short-form '{c3_topic}' content on Instagram Reels drives organic discovery — zero ad spend required."
 
     trends.append({
         "platform":    "Instagram India",
-        "headline":    ig_headline,
-        "hashtags":    ig_hashtags,
-        "opportunity": _format(platform_insights.get("instagram", ""), trend_topic, trend_direction)
-                       or f"Short-form {trend_topic} content on Instagram Reels drives high organic discovery — zero ad spend required.",
+        "headline":    c3_headline,
+        "hashtags":    ig_hashtags[:5],
+        "opportunity": c3_insight,
     })
 
-    # ── Card 4: Google Trends India ───────────────────────
+    # ── Card 4: Google Trends India — search demand signal ─
     gt_hashtags = ["#" + kw.replace(" ", "").title()[:20] for kw in trends_keywords[:5]]
     if trend_results:
-        peak = trend_results[0].get("peak_interest", 0)
-        avg  = trend_results[0].get("avg_interest", 0)
+        gt_kw   = trend_results[0].get("keyword", c1_topic)
+        peak    = trend_results[0].get("peak_interest", 0)
+        avg     = trend_results[0].get("avg_interest", 0)
         gt_headline = (
-            f"'{trend_topic}' searches are {trend_direction} in India "
-            f"— peak interest {peak}/100, avg {avg}/100 this week"
+            f"'{gt_kw.title()}' searches are {trend_direction} in India "
+            f"— peak {peak}/100, avg {avg}/100 this week"
         )
+        gt_insight = _format(
+            platform_insights.get("google_trends", ""), gt_kw.title(), trend_direction
+        ) or f"Search demand for '{gt_kw}' is {trend_direction} — strong organic discovery opportunity across Tier-1 cities."
     else:
-        # Meaningful fallback: describe what the search queries tell us
-        search_themes = ", ".join(f"'{kw}'" for kw in trends_keywords[:3])
+        # Fallback: describe what the searches tell us without Google Trends data
+        search_themes = " · ".join(f"'{kw}'" for kw in trends_keywords[:3])
         gt_headline = (
             f"India searches for {search_themes} are {trend_direction} "
-            f"— therapeutic and niche yoga demand outpacing generic content"
+            f"— niche demand outpacing generic wellness content"
         )
+        gt_insight = _format(
+            platform_insights.get("google_trends", ""), c1_topic, trend_direction
+        ) or f"Search demand for {c1_topic} is {trend_direction} across India — condition-specific content commands strong pricing power."
 
     trends.append({
         "platform":    "Google Trends India",
         "headline":    gt_headline,
-        "hashtags":    gt_hashtags,
-        "opportunity": _format(platform_insights.get("google_trends", ""), trend_topic, trend_direction)
-                       or f"Search demand for {trend_topic} is {trend_direction} across India — strong organic discovery opportunity.",
+        "hashtags":    gt_hashtags[:5],
+        "opportunity": gt_insight,
     })
 
+    # Venues filtered by the ACTIVE NICHE so they match the market theme
     venues = _select_venues(cfg, niche)
 
     return {
-        "market_headline":       market_headline,
-        "_live_market_headline": True,
+        "market_headline":       "",   # set by rotate_payload from weekly theme — not here
+        "_live_market_headline": True,  # sentinel: prevents static rotation from overwriting
         "trends":                trends,
         "venues":                venues,
         "trend_data": {
-            "youtube_count": len(yt_results) + len(ig_results),
+            "youtube_count": len(yt1_results) + len(yt2_results) + len(ig_results),
             "trends_count":  len(trend_results),
         },
     }
