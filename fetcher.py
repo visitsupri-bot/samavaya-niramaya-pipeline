@@ -285,12 +285,42 @@ def _select_venues(cfg: dict, niche: str, max_venues: int = _MAX_VENUES) -> list
     ]
 
 
+def _clean_topic(query: str) -> str:
+    """Extract a clean 2-3 word topic from a YouTube search query."""
+    # Remove trailing years, country names, filler words
+    stop = {"india", "2025", "2026", "hindi", "english", "for", "and", "the",
+            "with", "how", "to", "a", "an", "in", "of", "on", "by", "at"}
+    words = [w for w in query.lower().split() if w not in stop]
+    # Capitalise first 3 meaningful words
+    return " ".join(w.capitalize() for w in words[:3]) or query.split()[0].capitalize()
+
+
+def _make_hashtags(queries: list[str], count: int = 5) -> list[str]:
+    """Build clean, readable hashtags from search queries."""
+    seen: set[str] = set()
+    tags: list[str] = []
+    for q in queries:
+        # Take first 3 meaningful words, join camelCase
+        words = [w for w in q.lower().split()
+                 if w not in {"india", "2025", "2026", "hindi", "for", "and", "the", "a", "an"}]
+        tag = "#" + "".join(w.capitalize() for w in words[:3])
+        if tag not in seen and len(tag) < 28:
+            seen.add(tag)
+            tags.append(tag)
+        if len(tags) >= count:
+            break
+    return tags
+
+
 def fetch_opportunity(api_key: str, niche: str) -> Optional[dict]:
     """
-    Assemble a full rich opportunity dict for *niche* using live trend data.
-    Produces up to 4 trend cards: YouTube India, YouTube Kids/Sound,
-    Instagram India (via Shorts signal), Google Trends India.
-    Returns None if all sources are empty or niche is unknown.
+    Assemble a rich opportunity dict with 4 distinct trend cards:
+      1. YouTube India   — what's trending in yoga/wellness searches
+      2. Kids & Sound    — underserved content niche signal
+      3. Instagram India — Reels/short-form discovery angle
+      4. Google Trends   — search demand signal (or fallback insight)
+    Each card uses clean topic keywords, not raw video titles.
+    Returns None if all sources empty or niche unknown.
     """
     cfg = _load_fetch_config()
     niche_cfg = cfg.get("niches", {}).get(niche)
@@ -313,96 +343,128 @@ def fetch_opportunity(api_key: str, niche: str) -> Optional[dict]:
         logger.info("fetch_opportunity: all sources empty for niche %r -- returning None", niche)
         return None
 
-    # Shared context
-    top_trend       = trend_results[0] if trend_results else {}
-    top_yt_title    = yt_results[0]["title"] if yt_results else ""
-    trend_topic     = top_trend.get("keyword", "") or top_yt_title or niche.replace("_", " ")
-    is_rising       = top_trend.get("is_rising", True)
+    # ── Clean topic extraction ─────────────────────────────
+    # Use the most-searched QUERY as the topic (not the video title)
+    # Count how many results each query produced to find the dominant theme
+    query_counts: dict[str, int] = {}
+    for entry in yt_results:
+        q = entry.get("query", "")
+        query_counts[q] = query_counts.get(q, 0) + 1
+    for entry in ig_results:
+        q = entry.get("query", "")
+        query_counts[q] = query_counts.get(q, 0) + 1
+
+    top_query = max(query_counts, key=query_counts.get) if query_counts else (youtube_queries[0] if youtube_queries else niche)
+    trend_topic = _clean_topic(top_query)
+
+    # Google Trends topic overrides if available (more precise keyword signal)
+    if trend_results:
+        gt_topic = trend_results[0].get("keyword", "")
+        trend_topic = gt_topic.title() if gt_topic else trend_topic
+        is_rising = trend_results[0].get("is_rising", True)
+    else:
+        is_rising = True
     trend_direction = "upward" if is_rising else "stable"
 
+    # ── Market headline ────────────────────────────────────
     market_headline = _format(opportunity_template, trend_topic, trend_direction)
     if not market_headline:
-        market_headline = f"{trend_topic} interest is {trend_direction}"
+        market_headline = f"Growing demand for {trend_topic} — {trend_direction} opportunity in Indian wellness market"
 
     trends: list[dict] = []
 
-    # Card 1: YouTube India (primary queries)
-    if yt_results:
-        yt_seen: set[str] = set()
-        yt_hashtags: list[str] = []
-        for entry in yt_results:
-            tag = "#" + entry["query"].replace(" ", "").replace("-", "")[:25]
-            if tag not in yt_seen:
-                yt_seen.add(tag)
-                yt_hashtags.append(tag)
-            if len(yt_hashtags) >= 5:
-                break
-        if not yt_hashtags:
-            yt_hashtags = [f"#{q.split()[0].lower()}" for q in youtube_queries[:3]]
-        trends.append({
-            "platform":    "YouTube India",
-            "headline":    f"{yt_results[0]['title']} -- trending {trend_direction} on YouTube India",
-            "hashtags":    yt_hashtags,
-            "opportunity": _format(platform_insights.get("youtube", ""), trend_topic, trend_direction)
-                           or f"{trend_topic} content is {trend_direction} on YouTube -- first-mover opportunity available.",
-        })
+    # ── Card 1: YouTube India — primary wellness search trends ──
+    # Headline focuses on search volume signal, not video title
+    yt_topic_counts: dict[str, int] = {}
+    for e in yt_results:
+        q = e.get("query", "")
+        yt_topic_counts[q] = yt_topic_counts.get(q, 0) + 1
+    top_yt_queries = sorted(yt_topic_counts, key=yt_topic_counts.get, reverse=True)[:3]
+    yt_topics_str = " + ".join(_clean_topic(q) for q in top_yt_queries[:2])
 
-    # Card 2: YouTube Kids & Sound Healing (instagram_queries)
-    if ig_results:
-        ig_seen: set[str] = set()
-        yt2_hashtags: list[str] = []
-        for entry in ig_results:
-            tag = "#" + entry["query"].replace(" ", "").replace("-", "")[:25]
-            if tag not in ig_seen:
-                ig_seen.add(tag)
-                yt2_hashtags.append(tag)
-            if len(yt2_hashtags) >= 5:
-                break
-        if not yt2_hashtags:
-            yt2_hashtags = ["#kidsyoga", "#soundhealing", "#yogaforkids", "#soundbath"]
-        ig_topic = ig_results[0].get("query", trend_topic).split()[0]
-        trends.append({
-            "platform":    "YouTube -- Kids & Sound",
-            "headline":    f"{ig_results[0]['title']} -- Kids & Sound content {trend_direction} on YouTube",
-            "hashtags":    yt2_hashtags,
-            "opportunity": _format(platform_insights.get("youtube_kids_sound", ""), ig_topic, trend_direction)
-                           or f"Kids yoga and sound healing is {trend_direction} -- underserved niche with high growth potential.",
-        })
+    yt_headline = (
+        f"{len(yt_results)} videos found for '{yt_topics_str}' — "
+        f"viewer demand is {trend_direction} on YouTube India"
+        if yt_results else
+        f"YouTube India: {trend_topic} content demand is {trend_direction}"
+    )
+    yt_hashtags = _make_hashtags(top_yt_queries + youtube_queries)
 
-    # Card 3: Instagram India (derived from Shorts/Reels signal)
-    ig_hashtags = ["#" + kw.replace(" ", "").lower()[:20] for kw in trends_keywords[:5]]
+    trends.append({
+        "platform":    "YouTube India",
+        "headline":    yt_headline,
+        "hashtags":    yt_hashtags[:5],
+        "opportunity": _format(platform_insights.get("youtube", ""), trend_topic, trend_direction)
+                       or f"{trend_topic} is {trend_direction} on YouTube India — authentic teacher-led content commands highest watch time.",
+    })
+
+    # ── Card 2: Kids & Sound Healing — underserved niche ──
+    ig_topic_counts: dict[str, int] = {}
+    for e in ig_results:
+        q = e.get("query", "")
+        ig_topic_counts[q] = ig_topic_counts.get(q, 0) + 1
+    top_ig_queries = sorted(ig_topic_counts, key=ig_topic_counts.get, reverse=True)[:2]
+    ig_topics_str = " + ".join(_clean_topic(q) for q in top_ig_queries[:2]) if top_ig_queries else "Kids Yoga & Sound Healing"
+
+    yt2_headline = (
+        f"{len(ig_results)} videos for '{ig_topics_str}' — "
+        f"Kids & Sound content {trend_direction} on YouTube India"
+        if ig_results else
+        f"Kids Yoga & Sound Healing content demand is {trend_direction} on YouTube India"
+    )
+    yt2_hashtags = _make_hashtags(top_ig_queries + instagram_queries) or ["#KidsYoga", "#SoundHealing", "#YogaForKids", "#SoundBath"]
+
+    trends.append({
+        "platform":    "YouTube — Kids & Sound",
+        "headline":    yt2_headline,
+        "hashtags":    yt2_hashtags[:5],
+        "opportunity": _format(platform_insights.get("youtube_kids_sound", ""), ig_topics_str, trend_direction)
+                       or f"Kids yoga and sound healing is {trend_direction} — underserved niche with high growth potential in India.",
+    })
+
+    # ── Card 3: Instagram India — Reels discovery angle ───
+    # Build meaningful hashtags from Google Trends keywords (actual search terms)
+    ig_hashtags = ["#" + kw.replace(" ", "").title()[:20] for kw in trends_keywords[:5]]
     if not ig_hashtags:
-        ig_hashtags = ["#yogaindia", "#soundhealing", "#therapeuticyoga", "#kidsyoga"]
-    if ig_results:
-        ig_headline = (
-            f"Instagram India: {trend_topic} Reels content is {trend_direction}"
-            f" -- '{ig_results[0]['title'][:50]}' signals viral potential"
-        )
-    else:
-        ig_headline = f"Instagram India: {trend_topic} content is {trend_direction} -- Reels driving discovery"
+        ig_hashtags = ["#YogaIndia", "#SoundHealing", "#TherapeuticYoga", "#KidsYoga", "#YogaNidra"]
+
+    # Headline focuses on content strategy, not a raw video title
+    ig_headline = (
+        f"Instagram India: '{trend_topic}' Reels are {trend_direction} — "
+        f"{len(ig_results) if ig_results else 'high'} videos signal strong short-form demand"
+    )
+
     trends.append({
         "platform":    "Instagram India",
         "headline":    ig_headline,
         "hashtags":    ig_hashtags,
         "opportunity": _format(platform_insights.get("instagram", ""), trend_topic, trend_direction)
-                       or f"Short-form {trend_topic} content on Instagram Reels reaches new audiences with zero ad spend.",
+                       or f"Short-form {trend_topic} content on Instagram Reels drives high organic discovery — zero ad spend required.",
     })
 
-    # Card 4: Google Trends India
+    # ── Card 4: Google Trends India ───────────────────────
+    gt_hashtags = ["#" + kw.replace(" ", "").title()[:20] for kw in trends_keywords[:5]]
     if trend_results:
         peak = trend_results[0].get("peak_interest", 0)
         avg  = trend_results[0].get("avg_interest", 0)
-        gt_headline = f'"{trend_topic}" searches {trend_direction} -- peak {peak}/100, avg {avg}/100 this week'
+        gt_headline = (
+            f"'{trend_topic}' searches are {trend_direction} in India "
+            f"— peak interest {peak}/100, avg {avg}/100 this week"
+        )
     else:
-        gt_headline = f"Google Trends: {trend_topic} search interest is {trend_direction} across India"
-    # Fix: properly # prefix Google Trends keywords
-    gt_hashtags = ["#" + kw.replace(" ", "").lower()[:20] for kw in trends_keywords[:5]]
+        # Meaningful fallback: describe what the search queries tell us
+        search_themes = ", ".join(f"'{kw}'" for kw in trends_keywords[:3])
+        gt_headline = (
+            f"India searches for {search_themes} are {trend_direction} "
+            f"— therapeutic and niche yoga demand outpacing generic content"
+        )
+
     trends.append({
         "platform":    "Google Trends India",
         "headline":    gt_headline,
         "hashtags":    gt_hashtags,
         "opportunity": _format(platform_insights.get("google_trends", ""), trend_topic, trend_direction)
-                       or f"Search demand for {trend_topic} is {trend_direction} -- strong organic discovery opportunity.",
+                       or f"Search demand for {trend_topic} is {trend_direction} across India — strong organic discovery opportunity.",
     })
 
     venues = _select_venues(cfg, niche)
