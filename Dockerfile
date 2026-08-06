@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir \
     -r requirements.txt
 
 # Copy pipeline source
-COPY builder.py fetcher.py uploader.py generate.py ./
+COPY builder.py fetcher.py uploader.py generate.py github_pusher.py ./
 COPY config/ ./config/
 
 # Seed JSON template — pipeline uses most recent file in resources/
