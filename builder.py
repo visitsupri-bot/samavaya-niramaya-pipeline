@@ -51,7 +51,7 @@ def fetch_live_user_data() -> dict:
     and returns only the user-data section keys.
     Returns an empty dict if neither source is reachable.
     """
-    for url in (GCS_LATEST_URL, GITHUB_RAW_URL):
+    for url in (GITHUB_RAW_URL, GCS_LATEST_URL):
         try:
             with urllib.request.urlopen(url, timeout=10) as resp:
                 live = json.loads(resp.read().decode())
