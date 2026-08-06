@@ -47,18 +47,53 @@ GITHUB_RAW_URL = (
 
 def fetch_live_user_data() -> dict:
     """
-    Fetches the currently-live latest.json from GCS (or GitHub raw as fallback)
-    and returns only the user-data section keys.
-    Returns an empty dict if neither source is reachable.
+    Fetches the currently-live latest.json from GitHub raw first (where the app's
+    Save button writes to), falling back to GCS. Returns only user-data section keys.
+
+    Rejects any source whose participant data looks like the original sample/placeholder
+    data (par_001 / "Ananya S." etc.) — so the pipeline can never propagate fake names.
+    Returns an empty dict if no real data is reachable.
     """
+    # Sentinel: IDs and names that identify the original sample dataset.
+    # If ALL participants from a source match these, the data is fake — skip it.
+    SAMPLE_IDS   = {'par_001', 'par_002', 'par_003', 'par_004', 'par_005', 'par_006', 'par_007'}
+    SAMPLE_NAMES = {'Ananya S.', 'Rohan M.', 'Priya K.', 'Vijay T.', 'Meera L.', 'Aditya R.', 'Sunita P.'}
+
+    def _is_sample(sections: dict) -> bool:
+        """Return True if the participants look like the original placeholder data."""
+        # Check flat participants list
+        flat = sections.get('participants', [])
+        if flat:
+            ids   = {p.get('id')   for p in flat if isinstance(p, dict)}
+            names = {p.get('name') for p in flat if isinstance(p, dict)}
+            if ids and ids.issubset(SAMPLE_IDS) and names and names.issubset(SAMPLE_NAMES):
+                return True
+        # Check per-class map
+        pbc = sections.get('participants_by_class', {})
+        if pbc:
+            all_ids = {
+                p.get('id')
+                for lst in pbc.values() if isinstance(lst, list)
+                for p in lst if isinstance(p, dict)
+            }
+            if all_ids and all_ids.issubset(SAMPLE_IDS):
+                return True
+        return False
+
     for url in (GITHUB_RAW_URL, GCS_LATEST_URL):
         try:
             with urllib.request.urlopen(url, timeout=10) as resp:
                 live = json.loads(resp.read().decode())
                 sections = live.get('sections', {})
+                if _is_sample(sections):
+                    logger.warning(
+                        'Skipping %s — participant data looks like sample/placeholder data', url
+                    )
+                    continue
                 return {k: sections[k] for k in USER_DATA_KEYS if k in sections}
         except Exception as exc:  # noqa: BLE001
             logger.warning('Could not fetch live user data from %s: %s', url, exc)
+    logger.warning('No real user data found in any source — user-data keys will use template values')
     return {}
 
 
