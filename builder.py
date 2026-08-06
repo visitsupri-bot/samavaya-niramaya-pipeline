@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # ── User-data preservation ────────────────────────────────
 # Keys owned exclusively by the app — pipeline never overwrites these
 USER_DATA_KEYS = [
-    'participants', 'attendance', 'invoices', 'venues',
+    'participants', 'participants_by_class', 'attendance', 'invoices', 'venues',
     'week_overrides', 'venue_pipeline', 'wisdom_favourites',
 ]
 

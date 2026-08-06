@@ -4,64 +4,74 @@
 
 classes:
   - id: cls_001
-    name: Morning Hatha
-    day: Monday
-    time: "07:00"
-    venue: "Ananda Studio, Pune"
+    name: Kids Yoga
+    day: Saturday
+    time: "09:00"
+    venue: ""
     type: fixed
-    capacity: 10
-    enrolled: 8
-    rate: 4800
+    capacity: 15
+    enrolled: 9
+    rate: 1000
 
   - id: cls_002
-    name: Evening Vinyasa
-    day: Monday
-    time: "18:30"
-    venue: "Skyflow Wellness, Pune"
+    name: Morning Yoga
+    day: Tuesday
+    time: "07:00"
+    venue: ""
     type: fixed
-    capacity: 12
-    enrolled: 9
-    rate: 5200
+    capacity: 10
+    enrolled: 6
+    rate: 2000
 
   - id: cls_003
-    name: Yin Yoga
-    day: Wednesday
-    time: "19:00"
-    venue: "Ananda Studio, Pune"
-    type: dropin
-    capacity: 8
-    enrolled: 5
-    rate: 800
+    name: Morning Yoga
+    day: Thursday
+    time: "07:00"
+    venue: ""
+    type: fixed
+    capacity: 10
+    enrolled: 6
+    rate: 2000
 
   - id: cls_004
-    name: Pranayama & Meditation
-    day: Thursday
-    time: "06:30"
-    venue: Online (Zoom)
+    name: Evening Yoga Wednesday
+    day: Wednesday
+    time: "18:00"
+    venue: ""
     type: fixed
-    capacity: 20
-    enrolled: 14
+    capacity: 10
+    enrolled: 4
     rate: 2500
 
   - id: cls_005
-    name: Weekend Warriors Flow
-    day: Saturday
-    time: "08:00"
-    venue: "Terrace Garden, Koregaon Park"
-    type: dropin
-    capacity: 15
-    enrolled: 11
-    rate: 600
+    name: Evening Yoga Thursday
+    day: Thursday
+    time: "18:00"
+    venue: ""
+    type: fixed
+    capacity: 10
+    enrolled: 4
+    rate: 2500
 
   - id: cls_006
-    name: Sound Bath + Yoga Nidra
-    day: Sunday
-    time: "10:00"
-    venue: "Ananda Studio, Pune"
-    type: event
-    capacity: 20
-    enrolled: 18
-    rate: 1200
+    name: Evening Yoga Friday
+    day: Friday
+    time: "18:00"
+    venue: ""
+    type: fixed
+    capacity: 10
+    enrolled: 4
+    rate: 2500
+
+  - id: cls_007
+    name: Personal Yoga
+    day: Monday
+    time: "07:00"
+    venue: ""
+    type: fixed
+    capacity: 5
+    enrolled: 2
+    rate: 10000
 
 week_theme: "Sthira Sukham Asanam — Stability & Ease"
 week_ref: "Yoga Sutras 2.46"
