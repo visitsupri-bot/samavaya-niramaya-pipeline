@@ -14,11 +14,13 @@ Usage:
 
 import argparse
 import logging
+import os
 import sys
 from datetime import date
 from pathlib import Path
 
 import builder
+import github_pusher
 import uploader
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:%(message)s')
@@ -52,15 +54,30 @@ def main():
     # Step 2: Upload (unless --skip-upload)
     if args.skip_upload:
         print("")
-        print("[2/2] Skipping upload (--skip-upload flag set)")
+        print("[2/3] Skipping upload (--skip-upload flag set)")
     else:
         print("")
-        print("[2/2] Uploading to GCS...")
+        print("[2/3] Uploading to GCS...")
         try:
             uploader.upload(target_date, args.bucket)
         except Exception as exc:
             print("Upload failed: " + str(exc), file=sys.stderr)
             sys.exit(1)
+
+    # Step 3: Push latest.json to GitHub so the app's fetch chain picks up today's content
+    print("")
+    print("[3/3] Pushing latest.json to GitHub...")
+    gh_token = os.environ.get("GH_TOKEN", "").strip()
+    if not gh_token:
+        print("      ⚠️  GH_TOKEN not set — skipping GitHub push (app will use GCS fallback)")
+    elif args.skip_upload:
+        print("      Skipping GitHub push (--skip-upload mode)")
+    else:
+        try:
+            github_pusher.push_to_github(target_date, gh_token)
+        except Exception as exc:
+            # Non-fatal: GCS is the live source; GitHub is only the priority-1 cache
+            print("      ⚠️  GitHub push failed (non-fatal): " + str(exc), file=sys.stderr)
 
     print("")
     print("Pipeline complete for " + target_date.isoformat())

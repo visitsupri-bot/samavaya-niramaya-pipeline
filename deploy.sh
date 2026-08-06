@@ -65,9 +65,9 @@ docker push "${IMAGE}"
 # ── 6. Cloud Run Job ──────────────────────────────────────
 echo "[6/8] Creating/updating Cloud Run Job ${JOB_NAME}…"
 if gcloud run jobs describe "${JOB_NAME}" --region="${REGION}" --project="${PROJECT}" &>/dev/null; then
-  gcloud run jobs update "${JOB_NAME}" --image="${IMAGE}" --region="${REGION}" --project="${PROJECT}" --service-account="${SA_EMAIL}" --max-retries=2 --set-env-vars="YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}" --quiet
+  gcloud run jobs update "${JOB_NAME}" --image="${IMAGE}" --region="${REGION}" --project="${PROJECT}" --service-account="${SA_EMAIL}" --max-retries=2 --set-env-vars="YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-},GH_TOKEN=${GH_TOKEN:-}" --quiet
 else
-  gcloud run jobs create "${JOB_NAME}" --image="${IMAGE}" --region="${REGION}" --project="${PROJECT}" --service-account="${SA_EMAIL}" --max-retries=2 --set-env-vars="YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-}" --quiet
+  gcloud run jobs create "${JOB_NAME}" --image="${IMAGE}" --region="${REGION}" --project="${PROJECT}" --service-account="${SA_EMAIL}" --max-retries=2 --set-env-vars="YOUTUBE_API_KEY=${YOUTUBE_API_KEY:-},GH_TOKEN=${GH_TOKEN:-}" --quiet
 fi
 
 # ── 7. IAM for Scheduler → Cloud Run ─────────────────────
